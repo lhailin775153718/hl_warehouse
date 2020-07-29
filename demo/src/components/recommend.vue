@@ -1,0 +1,127 @@
+<template>
+  <div class="recommend">
+    <div
+      class="recommend-item"
+      :class="{'recommendFirst':index == 0 || index == 1}"
+      v-for="(item,index) in recommend"
+      :key="index"
+    >
+      <img class="recommend-item-image" :src="item.src" />
+      <div class="recommend-item-content">
+        <p>{{item.name}}</p>
+        <span class="contentPrice">
+          <span class="Currency">￥</span>
+          {{item.price}}
+        </span>
+        <img class="contentImage" src="../../static/image/carLogo.png" />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { Progress } from "vant";
+export default {
+  /**
+   * title:标题
+   * leftText:左边文本
+   * rightText:右边文本
+   * isLeftArrow:是否有返回箭头
+   */
+  props: [],
+  data() {
+    return {
+      nowTime: new Date().getHours(),
+      recommend: [
+        {
+          name: "Burberry红粉恋歌/粉红风格女士Burberry红粉恋歌/粉红风格女士...",
+          src: "../../static/image/test.jpg",
+          num: "623",
+          price: "66.00"
+        },
+        {
+          name: "Burberry红粉恋歌/粉红风格女士Burberry红粉恋歌/粉红风格女士...",
+          src: "../../static/image/test.jpg",
+          num: "623",
+          price: "66.00"
+        },
+        {
+          name: "Burberry红粉恋歌/粉红风格女士Burberry红粉恋歌/粉红风格女士...",
+          src: "../../static/image/test.jpg",
+          num: "623",
+          price: "66.00"
+        },
+        {
+          name: "Burberry红粉恋歌/粉红风格女士Burberry红粉恋歌/粉红风格女士...",
+          src: "../../static/image/test.jpg",
+          num: "623",
+          price: "66.00"
+        }
+      ]
+    };
+  },
+  components: {
+    "van-progress": Progress
+  },
+  methods: {}
+};
+</script>
+
+<style lang="less" scoped>
+.recommend {
+  display: flex;
+  flex-flow: wrap;
+  padding: 12.5px;
+  justify-content: space-between;
+  .recommendFirst {
+    margin-top: 0 !important;
+  }
+  .recommend-item {
+    width: 170px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    margin-top: 12.5px;
+    .recommend-item-image {
+      height: 170px;
+      width: 170px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .recommend-item-content {
+      position: relative;
+      height: 78.5px;
+      width: 100%;
+      p {
+        width: 138px;
+        margin: auto;
+        color: #2c2c2c;
+        font-size: 12px;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+      }
+      .Currency {
+        color: #da251c;
+        font-size: 13px;
+        font-weight: 400;
+      }
+      .contentPrice {
+        position: absolute;
+        bottom: 15px;
+        left: 15.5px;
+        color: #da251c;
+        font-size: 15px;
+        font-weight: bold;
+      }
+      .contentImage {
+        height: 24.5px;
+        width: 24.5px;
+        position: absolute;
+        bottom: 11px;
+        right: 15px;
+      }
+    }
+  }
+}
+</style>
