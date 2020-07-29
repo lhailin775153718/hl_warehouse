@@ -5,10 +5,11 @@
       :class="{'recommendFirst':index == 0 || index == 1}"
       v-for="(item,index) in recommend"
       :key="index"
+      @click="toDetail(item)"
     >
-      <img class="recommend-item-image" :src="item.src" />
+      <img class="recommend-item-image" :src="imageUrl + item.image" />
       <div class="recommend-item-content">
-        <p>{{item.name}}</p>
+        <p>{{item.goodsName}}</p>
         <span class="contentPrice">
           <span class="Currency">￥</span>
           {{item.price}}
@@ -31,39 +32,39 @@ export default {
   props: [],
   data() {
     return {
-      nowTime: new Date().getHours(),
-      recommend: [
-        {
-          name: "Burberry红粉恋歌/粉红风格女士Burberry红粉恋歌/粉红风格女士...",
-          src: "../../static/image/test.jpg",
-          num: "623",
-          price: "66.00"
-        },
-        {
-          name: "Burberry红粉恋歌/粉红风格女士Burberry红粉恋歌/粉红风格女士...",
-          src: "../../static/image/test.jpg",
-          num: "623",
-          price: "66.00"
-        },
-        {
-          name: "Burberry红粉恋歌/粉红风格女士Burberry红粉恋歌/粉红风格女士...",
-          src: "../../static/image/test.jpg",
-          num: "623",
-          price: "66.00"
-        },
-        {
-          name: "Burberry红粉恋歌/粉红风格女士Burberry红粉恋歌/粉红风格女士...",
-          src: "../../static/image/test.jpg",
-          num: "623",
-          price: "66.00"
-        }
-      ]
+      imageUrl: this.$https.imageUrl,
+      recommend: [],
+      selectInfo: {
+        page: 1,
+        pageSize: 10,
+        sort: "sales",
+      },
     };
   },
   components: {
-    "van-progress": Progress
+    "van-progress": Progress,
   },
-  methods: {}
+  created() {
+    this.getGoodsList();
+  },
+  methods: {
+    getGoodsList() {
+      let that = this;
+      this.$https
+        .get(that.$api.common.GoodsList, that.selectInfo)
+        .then((res) => {
+          this.recommend = res.data.data.records;
+        });
+    },
+    toDetail(val) {
+      this.$router.push({
+        path: "goodsDetail",
+        query: {
+          obj: val,
+        },
+      });
+    },
+  },
 };
 </script>
 

@@ -13,10 +13,10 @@
         v-for="(item,index) in list"
         :key="index"
       >
-        <img class="itemImage" src="../../../static/image/test.jpg" alt />
+        <img class="itemImage" :src="imageUrl + item.image" alt />
         <div class="itemRight">
-          <p class="itemTitle">{{item.title}}</p>
-          <span class="itemNum">{{item.num}}</span>
+          <p class="itemTitle">{{item.goodsName}}</p>
+          <span class="itemNum">{{item.sales}}</span>
           <span class="itemIntegral">
             {{item.integral}}积分+
             <span class="itemPirce">{{item.price}}</span>
@@ -35,34 +35,59 @@ import { Search } from "vant";
 export default {
   data() {
     return {
+      imageUrl: this.$https.imageUrl,
+      isLoading: false,
       header: {
         title: "积分专区",
-        isLeftArrow: true
+        isLeftArrow: true,
       },
       searchText: "",
-      list: [
-        {
-          title:
-            "Burberry红粉恋歌/粉红风格女士香水...Burberry红粉恋歌/粉红风格女士香水...0",
-          num: "638",
-          price: "200",
-          integral: "20000"
-        },
-        {
-          title:
-            "Burberry红粉恋歌/粉红风格女士香水...Burberry红粉恋歌/粉红风格女士香水...0",
-          num: "638",
-          price: "200",
-          integral: "20000"
-        }
-      ]
+      list: [],
+      selectForm: {
+        page: 1,
+        pageSize: 20,
+      },
     };
   },
   components: {
     "hl-header": header,
     "van-search": Search,
-    "hl-screening": screening
-  }
+    "hl-screening": screening,
+  },
+  created() {
+    this.getQuery();
+    this.getActivityList();
+  },
+  methods: {
+    getQuery() {
+      this.header.title = this.$route.query.text;
+      this.selectForm.activityType = this.$route.query.type;
+    },
+    getActivityList() {
+      if (this.isLoading) {
+        return;
+      }
+      let params = this.selectForm;
+      let that = this;
+      this.$https
+        .get(that.$api.common.activityGoodsList, params)
+        .then((res) => {
+          let array = res.data.data.records;
+          if (array.length > 0) {
+            this.list = this.$commonFn.scrollPushFn(this.list, array);
+          }
+          this.isLoading = false;
+        });
+    },
+    toDetail(val) {
+      this.$router.push({
+        path: "commodityDetail",
+        query: {
+          obj: val,
+        },
+      });
+    },
+  },
 };
 </script>
 

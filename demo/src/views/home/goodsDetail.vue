@@ -9,7 +9,7 @@
       <div class="goodsProp">
         <span class="price">{{goodsDetail.price}}</span>
         <div class="goodsProp-right">
-          <span class="num">ÒÑÊÛ{{goodsDetail.sales}}¼þ</span>
+          <span class="num">å·²å”®{{goodsDetail.sales}}ä»¶</span>
           <img src="../../../static/image/follow-act.png" alt />
         </div>
       </div>
@@ -46,20 +46,18 @@ export default {
     },
     getDetail() {
       let params = {
-        activityId: this.dataInfo.id,
+        goodsCode: this.dataInfo.goodsCode,
       };
       let that = this;
-      this.$https
-        .get(that.$api.common.getactivityGoodsDetail, params)
-        .then((res) => {
-          let array = res.data.data.goodsMediaList;
-          for (let i = 0; i < array.length; i++) {
-            let obj = {};
-            obj.imgUrl = array[i].fileUrl;
-            this.imageList.push(obj);
-          }
-          this.goodsDetail = res.data.data;
-        });
+      this.$https.get(that.$api.common.getGoodsDetail, params).then((res) => {
+        let array = res.data.data.goodsMediaList;
+        for (let i = 0; i < array.length; i++) {
+          let obj = {};
+          obj.imgUrl = array[i].fileUrl;
+          this.imageList.push(obj);
+        }
+        this.goodsDetail = res.data.data;
+      });
     },
     cancel() {
       this.$router.go(-1);
@@ -97,7 +95,7 @@ export default {
       font-size: 20px;
       color: #da251c;
       &::before {
-        content: "£¤";
+        content: "ï¿¥";
         font-size: 13px;
       }
     }

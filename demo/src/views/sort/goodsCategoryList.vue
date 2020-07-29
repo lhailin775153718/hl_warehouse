@@ -36,7 +36,7 @@ export default {
       imageUrl: this.$https.imageUrl,
       isLoading: false,
       header: {
-        title: "",
+        title: "分类",
         isLeftArrow: true,
       },
       searchText: "",
@@ -58,8 +58,7 @@ export default {
   },
   methods: {
     getQuery() {
-      this.header.title = this.$route.query.text;
-      this.selectForm.activityType = this.$route.query.type;
+      this.selectForm.categoryId = this.$route.query.categoryId;
     },
     getActivityList() {
       if (this.isLoading) {
@@ -68,12 +67,9 @@ export default {
       let params = this.selectForm;
       let that = this;
       this.$https
-        .get(that.$api.common.activityGoodsList, params)
+        .get(that.$api.common.goodsCategoryList, params)
         .then((res) => {
-          let array = res.data.data.records;
-          if (array.length > 0) {
-            this.list = this.$commonFn.scrollPushFn(this.list, array);
-          }
+          console.log(res);
           this.isLoading = false;
         });
     },

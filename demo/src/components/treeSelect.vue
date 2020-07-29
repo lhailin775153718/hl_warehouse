@@ -9,12 +9,12 @@
       >
         <div
           class="items"
-          v-for="(items,index) in list"
+          v-for="(items,index) in item.children"
           :key="index"
-          v-if="items.type == item.type"
+          @click="toGoodsCategoryList(items)"
         >
           <img class="itemImg" :src="items.src" alt />
-          <p class="itemName">{{items.name}}</p>
+          <p class="itemName">{{items.categoryName}}</p>
         </div>
       </div>
     </template>
@@ -29,61 +29,36 @@ export default {
     return {
       sidebarHeight: 0,
       active: 0,
-      sidebarTitle: [
-        { text: "标签称", type: 0 },
-        { text: "标签称1", type: 1 },
-        { text: "标签称1", type: 2 },
-        { text: "标签称1", type: 3 },
-        { text: "标签称1", type: 4 },
-        { text: "标签称2", type: 5 }
-      ],
-      list: [
-        {
-          name: "女装",
-          src: "../../static/image/test.jpg",
-          type: 0
-        },
-        {
-          name: "女装",
-          src: "../../static/image/test.jpg",
-          type: 0
-        },
-        {
-          name: "女装",
-          src: "../../static/image/test.jpg",
-          type: 0
-        },
-        {
-          name: "女装",
-          src: "../../static/image/test.jpg",
-          type: 0
-        },
-        {
-          name: "女装",
-          src: "../../static/image/test.jpg",
-          type: 0
-        },
-        {
-          name: "女装",
-          src: "../../static/image/test.jpg",
-          type: 1
-        },
-        {
-          name: "女装",
-          src: "../../static/image/test.jpg",
-          type: 1
-        }
-      ]
+      sidebarTitle: [],
     };
   },
   components: {
-    "van-tree-select": TreeSelect
+    "van-tree-select": TreeSelect,
   },
   created() {
     let windowHerght = document.body.clientHeight;
     this.sidebarHeight = windowHerght - 50 + "px";
+    this.getGoodsCategory();
   },
-  methods: {}
+  methods: {
+    getGoodsCategory() {
+      let that = this;
+      this.$https.get(that.$api.common.goodsCategory).then((res) => {
+        this.sidebarTitle = res.data.data;
+        for (let i = 0; i < this.sidebarTitle.length; i++) {
+          this.sidebarTitle[i].text = this.sidebarTitle[i].categoryName;
+        }
+      });
+    },
+    toGoodsCategoryList(val) {
+      this.$router.push({
+        path: "/goodsCategoryList",
+        query: {
+          categoryId: val.id,
+        },
+      });
+    },
+  },
 };
 </script>
 

@@ -2,7 +2,7 @@ import axios from 'axios'; // 引入axios
 import Storage from './storage'
 let imageUrl = 'http://shopkeeper.gdkeyong.com/file/';
 
-axios.defaults.baseURL = 'http://shopkeeper.gdkeyong.com/api/'
+axios.defaults.baseURL = 'http://shopkeeper.gdkeyong.com/api'
 export default {
     get(_url, _params) {
         _params = _params == null ? {} : _params;
