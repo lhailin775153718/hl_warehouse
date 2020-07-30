@@ -9,9 +9,12 @@ import Storage from './js/storage'
 import Api from './js/api'
 import CommonFn from './js/commonFn'
 
+
 // import Vant from 'vant';
 import 'vant/lib/index.css';
-import { Swipe, SwipeItem, Lazyload } from "vant";
+import { Swipe, SwipeItem, Lazyload, Tab, Tabs } from "vant";
+Vue.use(Tab);
+Vue.use(Tabs);
 Vue.use(Lazyload, {
     lazyComponent: true
 });

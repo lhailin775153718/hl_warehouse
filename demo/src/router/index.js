@@ -30,8 +30,12 @@ const cardAddComponent = resolve => require(['@/views/mine/cardAdd'], resolve) /
 const logisticsInformationComponent = resolve => require(['@/views/mine/logisticsInformation'], resolve) //填写物流信息
 const passwordEditComponent = resolve => require(['@/views/mine/passwordEdit'], resolve) //密码修改
 
+
+import mine from '@/views/mine/Mmine/router'
+
 const router = new Router({
     routes: [
+         ...mine,
         { path: '/', redirect: '/home' },
         { path: '/login', component: loginCompnent },
         { path: '/register', component: registerCompnent },
