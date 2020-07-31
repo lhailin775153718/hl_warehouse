@@ -14,13 +14,19 @@
         </div>
       </div>
     </div>
-    <hl-tab style="margin-top:10px;" v-if="goodsDetail.goodsDetail" :tab1="goodsDetail.goodsDetail.content" />
+    <hl-tab
+      style="margin-top:10px;"
+      v-if="goodsDetail.goodsDetail"
+      :tab1="goodsDetail.goodsDetail.content"
+    />
+    <hl-goodsAction :detail="goodsDetail" />
   </div>
 </template>
 
 <script>
 import imgSwipe from "@/components/imgSwipe";
 import tab from "@/components/tab";
+import goodsAction from "@/components/goodsAction";
 export default {
   data() {
     return {
@@ -35,6 +41,7 @@ export default {
   components: {
     "img-swipe": imgSwipe,
     "hl-tab": tab,
+    "hl-goodsAction": goodsAction,
   },
   created() {
     this.getQuery();
@@ -56,6 +63,11 @@ export default {
           obj.imgUrl = array[i].fileUrl;
           this.imageList.push(obj);
         }
+        res.data.data.goodsSpecVOS.forEach((res) => {
+          res.specProperties.forEach((resB) => {
+            resB.select = false;
+          });
+        });
         this.goodsDetail = res.data.data;
       });
     },

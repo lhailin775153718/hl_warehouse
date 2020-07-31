@@ -2,7 +2,7 @@
   <div>
     <van-search
       v-model="selectInfo"
-      placeholder="请输入搜索关键词111"
+      placeholder="请输入搜索关键词"
       shape="round"
       readonly
       @click="showSearch"

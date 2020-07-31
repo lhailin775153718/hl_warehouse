@@ -14,6 +14,10 @@ const common = {
     goodsCategoryList: '/goods/goodsCategory/getInfo', //获取分类详情
 
     getPrice: '/goods/getPrice', //获取规格价格
+    addGoods: '/order/shoppingCar/addGoods', //加入购物车
+    getShopCar: '/order/shoppingCar/getInfo', //获取购物车详情
+    carAddNum: '/order/shoppingCar/addNum', //购物车商品数量增加
+    settlement: '/order/shoppingCar/settlement', //购物车结算
 }
 
 export default {

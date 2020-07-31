@@ -4,7 +4,12 @@
     <van-tabs v-model="active">
       <van-tab class="test123456" v-for="(item, index) in tabList" :key="index" :title="item.name">
         <div class="itemA" :style="{height: height + 'px'}">
-          <div class="itemsList" v-for="(item, index) in itemsList" :key="index">
+          <div
+            class="itemsList"
+            v-for="(item, index) in itemsList"
+            :key="index"
+            @click="toPage(item)"
+          >
             <div class="blockA flex_c_sb">
               <div class="orderId">{{item.orderId}}</div>
               <div class="orderState">{{item.state}}</div>
@@ -126,7 +131,16 @@ export default {
     ];
     this.itemsList = data;
   },
-  methods: {},
+  methods: {
+    toPage(val) {
+      this.$router.push({
+        path: "/orderDetails",
+        query: {
+          obj: val,
+        },
+      });
+    },
+  },
 };
 </script>
 <style scoped lang="less">

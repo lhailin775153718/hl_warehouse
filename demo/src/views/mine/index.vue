@@ -1,13 +1,40 @@
 <template>
   <div>
-    <div class="header">123</div>
-    <div  @click="goRouter('orderDetails')">订单详情</div>
-    <div  @click="goRouter('integral')">我的积分</div>
-    <div  @click="goRouter('orderList')">订单列表</div>
+    <div class="header">
+      <div class="top">
+        <div class="title">我的</div>
+        <div class="img"></div>
+      </div>
+      <div class="head">
+        <div class="img"></div>
+        <div class="itemA">
+          <div class="itemB">
+            <div class="name">爱范儿</div>
+            <div class="tags">会员</div>
+          </div>
+          <div class="phone">18825060396</div>
+        </div>
+      </div>
+      <div class="column">
+        <div class="balance" @click="toPage('/integral')">
+          <div class="num">0</div>
+          <div class="text">账户余额(元)</div>
+        </div>
+        <div class="gold" @click="toPage('/integral')">
+          <div class="num">0</div>
+          <div class="text">金币</div>
+        </div>
+        <div class="integral" @click="toPage('/integral')">
+          <div class="num">0</div>
+          <div class="text">积分</div>
+        </div>
+      </div>
+    </div>
+    <!-- <div  @click="goRouter('integral')">我的积分</div> -->
     <div class="container">
       <div class="order">
         <span class="orderLeft">我的订单</span>
-        <span class="orderRight">查看全部订单></span>
+        <span class="orderRight" @click="toPage('/orderList')">查看全部订单></span>
       </div>
       <hl-grid :grid="grid" :columnNum="columnNum" />
     </div>
@@ -63,14 +90,102 @@ export default {
   },
   methods: {
     goRouter(item) {
-      console.log('item', item)
-      this.$router.push({name: item})
-    }
-  }
+      console.log("item", item);
+      this.$router.push({ name: item });
+    },
+    toPage(path) {
+      this.$router.push({ path: path });
+    },
+  },
 };
 </script>
 
 <style scoped lang="less">
+.header {
+  background-color: #cf332e;
+  color: #ffffff;
+  width: 100%;
+  .top {
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    position: relative;
+    .title {
+      display: inline-block;
+      font-size: 17px;
+    }
+    .img {
+      float: right;
+      height: 21.5px;
+      width: 21.5px;
+      background-image: url("../../../static/image/xiaoxi.png");
+      background-size: 100% 100%;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 8.5px;
+      margin: auto;
+    }
+  }
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    .img {
+      height: 55px;
+      width: 55px;
+      background-image: url("../../../static/image/test.jpg");
+      background-size: 100% 100%;
+      border-radius: 10px;
+    }
+    .itemA {
+      flex: 1;
+      margin-left: 17px;
+      .phone {
+        font-size: 12px;
+        margin-top: 10px;
+      }
+      .itemB {
+        display: flex;
+        align-items: center;
+        .name {
+          font-size: 20px;
+          font-weight: bold;
+        }
+        .tags {
+          height: 18px;
+          line-height: 18px;
+          background-color: #000000;
+          font-size: 10px;
+          margin-left: 5px;
+          border-radius: 5px;
+          padding: 0 8px;
+          box-sizing: border-box;
+        }
+      }
+    }
+  }
+  .column {
+    display: flex;
+    > div {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      padding: 10px 0;
+      box-sizing: border-box;
+      .num {
+        font-size: 17px;
+        font-weight: bold;
+      }
+      .text {
+        font-size: 12px;
+      }
+    }
+  }
+}
 .container {
   padding: 0 15px;
   box-sizing: border-box;

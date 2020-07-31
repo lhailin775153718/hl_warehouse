@@ -9,36 +9,40 @@
       >
         <div class="carListTitle">
           <img src="../../static/image/carLogo1.png" alt />
-          <span>{{item.name}}</span>
+          <span>{{item.shopName}}</span>
         </div>
-        <div class="carListContainer" v-for="(items,indexs) in item.carList" :key="indexs">
+        <div
+          class="carListContainer"
+          v-for="(items,indexs) in item.shoppingCarGoodsList"
+          :key="indexs"
+        >
           <img
             class="checkBox"
             :src="items.checked ? '../../static/image/check.png' : '../../static/image/check-bg.png'"
             alt
+            @click="checkItem(items)"
           />
-          <img class="carListContainer-image" :src="items.imageUrl" alt />
-          <p class="carListContainer-title">{{items.title}}</p>
+          <img class="carListContainer-image" :src="imageUrl + items.goodsImage" alt />
+          <p class="carListContainer-title">{{items.goodsName}}</p>
           <div class="carListContainer-tag">
-            <span>{{items.tags}}</span>
+            <span>{{items.specName}}</span>
             <img src="../../static/image/carLogo2.png" alt />
           </div>
           <span class="carListContainer-price">
             <span class="Currency">￥</span>
-            {{items.price}}
+            {{items.unitPrice * items.number}}
           </span>
           <div class="carListContainer-num">
             <van-stepper
               class="stepper"
-              v-model="num"
+              v-model="items.number"
               min="1"
               disable-input
-              input-width="40px"
-              button-size="32px"
+              input-width="35px"
+              button-size="25px"
+              @plus="plus(items)"
+              @minus="minus(items)"
             />
-            <div class="numLeft">-</div>
-            <div class="numText">{{items.num}}</div>
-            <div class="numRight">+</div>
           </div>
         </div>
       </div>
@@ -47,14 +51,15 @@
     <div class="total">
       <img
         class="total-checkBox"
-        :src="total.checked ? '../../static/image/check.png' : '../../static/image/check-bg.png'"
+        :src="checked ? '../../static/image/check.png' : '../../static/image/check-bg.png'"
         alt
+        @click="checkTotal()"
       />
       <span class="total-checkBoxText">全选</span>
       <span class="total-price">
         <span class="total-Currency">￥</span>66.00
       </span>
-      <div class="total-btn">去结算</div>
+      <div class="total-btn" @click="submit">去结算</div>
     </div>
 
     <div class="totalDiv"></div>
@@ -63,41 +68,94 @@
 
 <script>
 import { Stepper } from "vant";
+import Storage from "../js/storage";
 export default {
   props: [],
   data() {
     return {
-      list: [
-        {
-          name: "华山自营",
-          carList: [
-            {
-              num: 2,
-              price: "50.00",
-              title: "天禹盘锦大米10斤东北新米种植大米真空大米真空",
-              imageUrl: "../../static/image/test.jpg",
-              tags: "标签",
-              checked: true,
-            },
-            {
-              num: 3,
-              price: "50.00",
-              title: "特产大米",
-              imageUrl: "../../static/image/test.jpg",
-              tags: "标签",
-              checked: false,
-            },
-          ],
-        },
-      ],
-      total: {
-        checked: false,
-      },
-      num: 1,
+      imageUrl: this.$https.imageUrl,
+      list: [],
+      checked: false,
     };
   },
   components: {
     "van-stepper": Stepper,
+  },
+  created() {
+    this.getShopCar();
+  },
+  methods: {
+    getShopCar() {
+      let that = this;
+      this.$https.get(that.$api.common.getShopCar).then((res) => {
+        let temp = res.data.data.shoppingCarShopList;
+        temp.forEach((item) => {
+          item.shoppingCarGoodsList.forEach((res) => {
+            res.checked = false;
+          });
+        });
+        this.list = temp;
+      });
+    },
+    checkItem(items) {
+      items.checked = !items.checked;
+
+      let isAllCheck = true;
+      this.list.forEach((item) => {
+        item.shoppingCarGoodsList.forEach((res) => {
+          if (!res.checked) {
+            isAllCheck = false;
+          }
+        });
+      });
+      this.checked = isAllCheck;
+    },
+    checkTotal() {
+      this.checked = !this.checked;
+      this.list.forEach((item) => {
+        item.shoppingCarGoodsList.forEach((res) => {
+          res.checked = this.checked;
+        });
+      });
+    },
+    plus(items) {
+      let params = {
+        carId: items.id,
+        num: 1,
+      };
+      let that = this;
+      this.$https.post(that.$api.common.carAddNum, params).then((res) => {
+        console.log(res);
+      });
+    },
+    minus(items) {
+      let params = {
+        carId: items.id,
+        num: -1,
+      };
+      let that = this;
+      this.$https.post(that.$api.common.carAddNum, params).then((res) => {
+        console.log(res);
+      });
+    },
+    submit() {
+      let arr = [];
+      this.list.forEach((item) => {
+        item.shoppingCarGoodsList.forEach((res) => {
+          if (res.checked) {
+            arr.push(res.id);
+          }
+        });
+      });
+      let params = {
+        shoppingCarIds: arr,
+        userCode: Storage.getItem("userInfo").userCode,
+      };
+      let that = this;
+      this.$https.post(that.$api.common.settlement, params).then((res) => {
+        console.log(res);
+      });
+    },
   },
 };
 </script>
@@ -191,30 +249,6 @@ export default {
         width: 105px;
         left: 260px;
         top: 80px;
-        .numLeft {
-          height: 26.5px;
-          width: 26.5px;
-          line-height: 26.5px;
-          display: inline-block;
-          text-align: center;
-          background-color: #f5f5f5;
-        }
-        .numText {
-          height: 26.5px;
-          width: 40px;
-          line-height: 26.5px;
-          display: inline-block;
-          text-align: center;
-          background-color: #f5f5f5;
-        }
-        .numRight {
-          height: 26.5px;
-          width: 26.5px;
-          line-height: 26.5px;
-          display: inline-block;
-          text-align: center;
-          background-color: #f5f5f5;
-        }
       }
     }
   }

@@ -13,7 +13,7 @@
       <div class="popupContainer" v-for="(item,index) in popup" :key="index">
         <span class="itemType">{{item.type}}</span>
         <div class="itemOpt">
-          <div v-for="(items,indexs) in item.opt" :key="indexs">{{items}}</div>
+          <div v-for="(items,indexs) in item.opt" :key="indexs">{{items.categoryName}}</div>
         </div>
       </div>
       <div class="reset">重置</div>
@@ -25,7 +25,7 @@
 <script>
 import { DropdownMenu, DropdownItem, Popup } from "vant";
 export default {
-  props: [],
+  props: ["selectForm"],
   data() {
     return {
       value1: 0,
@@ -34,45 +34,57 @@ export default {
       option1: [
         { text: "销量", value: 0 },
         { text: "最低销量", value: 1 },
-        { text: "最高销量", value: 2 }
+        { text: "最高销量", value: 2 },
       ],
       option2: [
         { text: "价格", value: "a" },
         { text: "最低价格", value: "b" },
-        { text: "最高价格", value: "c" }
+        { text: "最高价格", value: "c" },
       ],
       option3: [{ text: "筛选", value: "a" }],
       show: false,
       popup: [
         {
-          type: "价格区间",
-          opt: ["最低价格", "最高价格"]
+          type: "价格",
+          opt: [
+            {
+              categoryName: "从低到高",
+            },
+            {
+              categoryName: "从高到低",
+            },
+          ],
         },
         {
-          type: "价格区间",
-          opt: ["最低价格", "最高价格", "最高价格"]
+          type: "分类",
+          opt: [],
         },
-        {
-          type: "价格区间",
-          opt: ["最低价格", "最高价格", "最高价格", "最高价格"]
-        }
-      ]
+      ],
     };
   },
   components: {
     "van-dropdown-menu": DropdownMenu,
     "van-dropdown-item": DropdownItem,
-    "van-popup": Popup
+    "van-popup": Popup,
   },
-  created() {},
+  created() {
+    this.getGoodsCategory();
+  },
   methods: {
+    getGoodsCategory() {
+      let that = this;
+      this.$https.get(that.$api.common.goodsCategory).then((res) => {
+        this.popup[1].opt = res.data.data;
+        console.log(this.popup);
+      });
+    },
     onConfirm() {
       this.$refs.item.toggle();
     },
     showPopup() {
       this.show = true;
-    }
-  }
+    },
+  },
 };
 </script>
 
@@ -143,7 +155,7 @@ export default {
   position: absolute;
   right: 50%;
   bottom: 37.5px;
-  background-color: yellow;
+  background-color: #FF6800;
   border-top-left-radius: 15px;
   border-bottom-left-radius: 15px;
   color: #ffffff;
@@ -157,7 +169,7 @@ export default {
   position: absolute;
   left: 50%;
   bottom: 37.5px;
-  background-color: red;
+  background-color: #DB2016;
   border-top-right-radius: 15px;
   border-bottom-right-radius: 15px;
   color: #ffffff;

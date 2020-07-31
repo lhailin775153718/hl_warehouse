@@ -19,7 +19,7 @@
       v-if="goodsDetail.goodsDetail"
       :tab1="goodsDetail.goodsDetail.content"
     />
-    <hl-goodsAction v-if="goodsDetail.id" :detail="goodsDetail" />
+    <hl-goodsAction :detail="goodsDetail" />
   </div>
 </template>
 
@@ -65,24 +65,12 @@ export default {
             obj.imgUrl = array[i].fileUrl;
             this.imageList.push(obj);
           }
-
-          let data = {
-            title: '大小',
-            id:'6666',
-            specProperties: [
-              {id:'6661', propertyName: '小', select: false},
-              {id:'6662', propertyName: '中', select: false},
-              {id:'6663', propertyName: '大', select: false}
-            ]
-          }
-          res.data.data.goodsSpecVOS.push(data)
-          res.data.data.goodsSpecVOS.forEach(res => {
-            res.specProperties.forEach(resB => {
-              resB.select = false
-            })
-          })
+          res.data.data.goodsSpecVOS.forEach((res) => {
+            res.specProperties.forEach((resB) => {
+              resB.select = false;
+            });
+          });
           this.goodsDetail = res.data.data;
-
         });
     },
     cancel() {

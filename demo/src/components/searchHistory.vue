@@ -1,12 +1,18 @@
 <template>
   <div class="container">
-    <van-search v-model="selectInfo" show-action placeholder="请输入搜索关键词" @search="onSearch">
+    <van-search
+      v-model="selectInfo"
+      shape="round"
+      show-action
+      placeholder="请输入搜索关键词"
+      @search="onSearch"
+    >
       <template #action>
         <div @click="cancelSearch">取消</div>
       </template>
     </van-search>
     <div class="searchHistory">
-      <div class="item" v-for="(item,index) in historyList" :key="index">
+      <div class="item" v-for="(item,index) in historyList" :key="index" @click="onSearch(item)">
         <p>{{item}}</p>
       </div>
     </div>
@@ -34,10 +40,20 @@ export default {
   },
   methods: {
     onSearch(val) {
-      this.historyList = this.remove(this.historyList, this.selectInfo);
-      this.historyList.unshift(this.selectInfo);
-      localStorage.setItem("historyList", JSON.stringify(this.historyList));
-      this.$emit("onSearch", this.selectInfo);
+      this.selectInfo = val;
+      if (val != "") {
+        this.historyList = this.remove(this.historyList, this.selectInfo);
+        this.historyList.unshift(this.selectInfo);
+        localStorage.setItem("historyList", JSON.stringify(this.historyList));
+      }
+      if (this.$route.path == "/home") {
+        this.$router.push({
+          path: "/recommendationZone",
+          query: { selectInfo: this.selectInfo },
+        });
+      } else {
+        this.$emit("onSearch", this.selectInfo);
+      }
     },
     cancelSearch() {
       this.$emit("cancelSearch");
@@ -62,7 +78,7 @@ export default {
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: 1000;
   background-color: #ffffff;
   .searchHistory {
     display: flex;

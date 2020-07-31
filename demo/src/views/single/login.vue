@@ -3,7 +3,8 @@
     <div class="backImage"></div>
     <div class="phone">
       <input type="phone" placeholder="请输入手机号" v-model="phoneNumber" />
-      <div class="codeBtn" @click="getCode">获取验证码</div>
+      <div class="codeBtn" @click="getCode" v-show="show">获取验证码</div>
+      <div class="codeBtn" v-show="!show">{{count}} s</div>
     </div>
     <div class="code">
       <input type="text" placeholder="请输入验证码" v-model="code" />
@@ -12,7 +13,7 @@
     <div class="registerContainer">
       <span class="register" @click="register">注册</span>
       <div class="forGet">
-        <span>忘记密码</span>
+        <!-- <span>忘记密码</span> -->
       </div>
     </div>
   </div>
@@ -26,6 +27,9 @@ export default {
     return {
       phoneNumber: "",
       code: "",
+      show: true,
+      count: "",
+      timer: null,
     };
   },
   components: {
@@ -59,6 +63,22 @@ export default {
         path: "/register",
       });
     },
+    getCode() {
+      const TIME_COUNT = 60;
+      if (!this.timer) {
+        this.count = TIME_COUNT;
+        this.show = false;
+        this.timer = setInterval(() => {
+          if (this.count > 0 && this.count <= TIME_COUNT) {
+            this.count--;
+          } else {
+            this.show = true;
+            clearInterval(this.timer);
+            this.timer = null;
+          }
+        }, 1000);
+      }
+    },
   },
 };
 </script>
@@ -89,6 +109,7 @@ export default {
       font-size: 15px;
     }
     .codeBtn {
+      width: 83px;
       display: inline-block;
       box-sizing: border-box;
       color: #959595;

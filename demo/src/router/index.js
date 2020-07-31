@@ -35,8 +35,8 @@ import mine from '@/views/mine/Mmine/router'
 
 const router = new Router({
     routes: [
-         ...mine,
-        { path: '/', redirect: '/home' },
+        ...mine,
+        { path: '/', redirect: '/login' },
         { path: '/login', component: loginCompnent },
         { path: '/register', component: registerCompnent },
         { path: '/home', component: homeComponent },

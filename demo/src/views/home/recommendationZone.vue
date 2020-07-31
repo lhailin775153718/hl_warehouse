@@ -1,9 +1,21 @@
 <template>
   <div>
     <hl-header :header="header"></hl-header>
-    <van-search v-model="searchText" placeholder="请输入搜索关键词" />
+    <van-search
+      v-model="selectInfo"
+      placeholder="请输入搜索关键词"
+      shape="round"
+      readonly
+      @click="showSearch"
+    />
+    <hl-searchHistory
+      :selectData="selectData"
+      @onSearch="onSearch"
+      @cancelSearch="cancelSearch"
+      v-if="isSearch"
+    />
     <div style="margin-top:1px;">
-      <hl-screening />
+      <hl-screening :selectForm="selectForm" />
     </div>
 
     <div class="list">
@@ -30,6 +42,7 @@
 import header from "@/components/header";
 import screening from "@/components/screening";
 import { Search } from "vant";
+import searchHistory from "@/components/searchHistory";
 export default {
   data() {
     return {
@@ -39,7 +52,9 @@ export default {
         title: "",
         isLeftArrow: true,
       },
-      searchText: "",
+      selectInfo: "",
+      selectData: "",
+      isSearch: false,
       list: [],
       selectForm: {
         page: 1,
@@ -51,6 +66,7 @@ export default {
     "hl-header": header,
     "van-search": Search,
     "hl-screening": screening,
+    "hl-searchHistory": searchHistory,
   },
   created() {
     this.getQuery();
@@ -58,14 +74,25 @@ export default {
   },
   methods: {
     getQuery() {
-      this.header.title = this.$route.query.text;
-      this.selectForm.activityType = this.$route.query.type;
+      this.header.title =
+        this.$route.query.text == undefined ? "商品" : this.$route.query.text;
+      this.selectInfo =
+        this.$route.query.selectInfo == undefined
+          ? ""
+          : this.$route.query.selectInfo;
+      this.selectForm.activityType =
+        this.$route.query.type == undefined ? "" : this.$route.query.type;
+      this.selectForm.goodsName =
+        this.$route.query.selectInfo == undefined
+          ? ""
+          : this.$route.query.selectInfo;
     },
     getActivityList() {
       if (this.isLoading) {
         return;
       }
       let params = this.selectForm;
+      params.goodsName = this.selectInfo;
       let that = this;
       this.$https
         .get(that.$api.common.activityGoodsList, params)
@@ -84,6 +111,19 @@ export default {
           obj: val,
         },
       });
+    },
+    onSearch(val) {
+      this.selectInfo = val;
+      this.isSearch = false;
+      console.log("成功");
+      this.getActivityList();
+    },
+    showSearch() {
+      this.selectData = this.selectInfo;
+      this.isSearch = true;
+    },
+    cancelSearch() {
+      this.isSearch = false;
     },
   },
 };
