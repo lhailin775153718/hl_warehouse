@@ -1,21 +1,41 @@
 <template>
   <div>
     <div class="carList">
-      <div class="carList-item" :class="{'carList-active':index > 0}" v-for="(item,index) in list" :key="index">
+      <div
+        class="carList-item"
+        :class="{'carList-active':index > 0}"
+        v-for="(item,index) in list"
+        :key="index"
+      >
         <div class="carListTitle">
           <img src="../../static/image/carLogo1.png" alt />
           <span>{{item.name}}</span>
         </div>
         <div class="carListContainer" v-for="(items,indexs) in item.carList" :key="indexs">
-          <img class="checkBox" :src="items.checked ? '../../static/image/check.png' : '../../static/image/check-bg.png'" alt="">
-          <img class="carListContainer-image" :src="items.imageUrl" alt="">
+          <img
+            class="checkBox"
+            :src="items.checked ? '../../static/image/check.png' : '../../static/image/check-bg.png'"
+            alt
+          />
+          <img class="carListContainer-image" :src="items.imageUrl" alt />
           <p class="carListContainer-title">{{items.title}}</p>
           <div class="carListContainer-tag">
             <span>{{items.tags}}</span>
-            <img src="../../static/image/carLogo2.png" alt="">
+            <img src="../../static/image/carLogo2.png" alt />
           </div>
-          <span class="carListContainer-price"><span class="Currency">￥</span>{{items.price}}</span>
+          <span class="carListContainer-price">
+            <span class="Currency">￥</span>
+            {{items.price}}
+          </span>
           <div class="carListContainer-num">
+            <van-stepper
+              class="stepper"
+              v-model="num"
+              min="1"
+              disable-input
+              input-width="40px"
+              button-size="32px"
+            />
             <div class="numLeft">-</div>
             <div class="numText">{{items.num}}</div>
             <div class="numRight">+</div>
@@ -25,9 +45,15 @@
     </div>
 
     <div class="total">
-      <img class="total-checkBox" :src="total.checked ? '../../static/image/check.png' : '../../static/image/check-bg.png'" alt="">
+      <img
+        class="total-checkBox"
+        :src="total.checked ? '../../static/image/check.png' : '../../static/image/check-bg.png'"
+        alt
+      />
       <span class="total-checkBoxText">全选</span>
-      <span class="total-price"><span class="total-Currency">￥</span>66.00</span>
+      <span class="total-price">
+        <span class="total-Currency">￥</span>66.00
+      </span>
       <div class="total-btn">去结算</div>
     </div>
 
@@ -36,7 +62,7 @@
 </template>
 
 <script>
-
+import { Stepper } from "vant";
 export default {
   props: [],
   data() {
@@ -51,7 +77,7 @@ export default {
               title: "天禹盘锦大米10斤东北新米种植大米真空大米真空",
               imageUrl: "../../static/image/test.jpg",
               tags: "标签",
-              checked: true
+              checked: true,
             },
             {
               num: 3,
@@ -59,75 +85,78 @@ export default {
               title: "特产大米",
               imageUrl: "../../static/image/test.jpg",
               tags: "标签",
-              checked: false
-            }
-          ]
-        }
+              checked: false,
+            },
+          ],
+        },
       ],
       total: {
-        checked: false
-      }
+        checked: false,
+      },
+      num: 1,
     };
   },
-  components: {}
+  components: {
+    "van-stepper": Stepper,
+  },
 };
 </script>
 
 <style scoped lang="less">
-.carList{
+.carList {
   background-color: #ffffff;
   width: 100%;
-  .carList-active{
+  .carList-active {
     border-top: 0.5px solid rgba(0, 0, 0, 0.1);
   }
-  .carList-item{
-    .carListTitle{
+  .carList-item {
+    .carListTitle {
       display: flex;
       height: 40px;
       padding-left: 12.5px;
       box-sizing: border-box;
       align-items: center;
-      img{
+      img {
         height: 13.5px;
         width: 14px;
       }
-      span{
-        color: #9B9B9B;
+      span {
+        color: #9b9b9b;
         font-size: 12px;
         margin-left: 4.5px;
       }
     }
-    .carListContainer{
+    .carListContainer {
       position: relative;
       height: 120px;
       padding-top: 10px;
       box-sizing: border-box;
-      .checkBox{
+      .checkBox {
         height: 18px;
         width: 18px;
         position: absolute;
         top: 35px;
         left: 12.5px;
       }
-      .carListContainer-image{
+      .carListContainer-image {
         height: 90px;
         width: 90px;
         position: absolute;
         left: 46px;
       }
-      .carListContainer-title{
+      .carListContainer-title {
         width: 212px;
-        color: #2C2C2C;
+        color: #2c2c2c;
         font-size: 14px;
-        overflow: hidden;  
-        display: -webkit-box;  
+        overflow: hidden;
+        display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         position: absolute;
         right: 14px;
       }
-      .carListContainer-tag{
-        background-color: #F5F5F5;
+      .carListContainer-tag {
+        background-color: #f5f5f5;
         position: absolute;
         height: 24px;
         top: 50px;
@@ -136,68 +165,68 @@ export default {
         display: flex;
         justify-content: center;
         align-items: center;
-        span{
+        span {
           color: #747474;
           font-size: 12px;
         }
-        img{
+        img {
           height: 4px;
           width: 7.5px;
           margin-left: 5px;
         }
       }
-      .carListContainer-price{
-        color: #DA251B;
+      .carListContainer-price {
+        color: #da251b;
         font-size: 14px;
         position: absolute;
         left: 150.5px;
         top: 87px;
-        .Currency{
+        .Currency {
           font-size: 10px;
         }
       }
-      .carListContainer-num{
+      .carListContainer-num {
         font-size: 15px;
         position: absolute;
         width: 105px;
         left: 260px;
         top: 80px;
-        .numLeft{
+        .numLeft {
           height: 26.5px;
           width: 26.5px;
           line-height: 26.5px;
           display: inline-block;
           text-align: center;
-          background-color: #F5F5F5;
+          background-color: #f5f5f5;
         }
-        .numText{
+        .numText {
           height: 26.5px;
           width: 40px;
           line-height: 26.5px;
           display: inline-block;
           text-align: center;
-          background-color: #F5F5F5;
+          background-color: #f5f5f5;
         }
-        .numRight{
+        .numRight {
           height: 26.5px;
           width: 26.5px;
           line-height: 26.5px;
           display: inline-block;
           text-align: center;
-          background-color: #F5F5F5;
+          background-color: #f5f5f5;
         }
       }
     }
   }
 }
-.total{
+.total {
   height: 53.5px;
   width: 100%;
   position: fixed;
   bottom: 50px;
   left: 0;
   background-color: #ffffff;
-  .total-checkBox{
+  .total-checkBox {
     height: 18px;
     width: 18px;
     position: absolute;
@@ -206,53 +235,53 @@ export default {
     bottom: 0;
     margin: auto;
   }
-  .total-checkBoxText{
+  .total-checkBoxText {
     color: #747474;
     font-size: 14px;
     line-height: 53.5px;
     position: absolute;
     left: 34.5px;
   }
-  .total-priceText{
+  .total-priceText {
     color: #747474;
     font-size: 14px;
     line-height: 53.5px;
     position: absolute;
     left: 174.5px;
   }
-  .total-price{
-    color: #DA251B;
+  .total-price {
+    color: #da251b;
     font-size: 16px;
     position: absolute;
     right: 109px;
     line-height: 53.5px;
-    &::before{
-      content: '合计:';
+    &::before {
+      content: "合计:";
       color: #747474;
       font-size: 14px;
       margin-right: 5px;
     }
-    .total-Currency{
+    .total-Currency {
       font-size: 10px;
     }
   }
-  .total-btn{
+  .total-btn {
     height: 35.5px;
     line-height: 35.5px;
     width: 90.5px;
-    background-image: url('../../static/image/block3.png');
+    background-image: url("../../static/image/block3.png");
     background-size: 100% 100%;
     position: absolute;
     top: 0;
     bottom: 0;
     right: 9.5px;
     margin: auto;
-    color: #FFFFFF;
+    color: #ffffff;
     font-size: 14px;
     text-align: center;
   }
 }
-.totalDiv{
+.totalDiv {
   height: 53.5px;
   width: 100%;
 }

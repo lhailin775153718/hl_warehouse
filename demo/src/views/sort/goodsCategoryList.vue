@@ -69,7 +69,6 @@ export default {
       this.$https
         .get(that.$api.common.goodsCategoryList, params)
         .then((res) => {
-          console.log(res);
           this.isLoading = false;
         });
     },

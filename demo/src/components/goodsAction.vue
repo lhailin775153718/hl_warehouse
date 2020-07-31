@@ -1,27 +1,203 @@
 <template>
-  <van-goods-action>
-    <van-goods-action-icon icon="chat-o" text="客服" dot />
-    <van-goods-action-icon icon="cart-o" text="购物车" badge="5" />
-    <van-goods-action-icon icon="shop-o" text="店铺" badge="12" />
-    <van-goods-action-button type="warning" text="加入购物车" />
-    <van-goods-action-button type="danger" text="立即购买" />
-  </van-goods-action>
+  <div>
+    <van-goods-action>
+      <van-goods-action-icon icon="chat-o" text="小店" />
+      <van-goods-action-icon icon="shop-o" text="客服" />
+      <van-goods-action-button color="#be99ff" type="warning" text="加入购物车" @click="addCar" />
+      <van-goods-action-button color="#7232dd" type="danger" text="立即购买" />
+    </van-goods-action>
+    <van-popup v-model="show" position="bottom">
+      <div class="popup-container">
+        <img class="popup-image" :src="imageUrl + detail.image" alt />
+        <span class="price">{{price}}</span>
+        <img class="close" src="../../static/image/close.png" @click="closeAction" alt />
+
+        <div class="scroll">
+          <div class="parameter" v-for="(item,index) in detail.goodsSpecVOS" :key="index">
+            <span class="parameterTitle">{{item.title}}</span>
+            <div class="parameterContent">
+              <span
+                v-for="(items,indexs) in item.specProperties"
+                :key="indexs"
+                :class="{'itemsActive': active[index] == indexs}"
+                @click="pickParameter(index,items,indexs)"
+              >{{items.propertyName}}</span>
+            </div>
+          </div>
+        </div>
+        <div class="buyMun">
+          <span>购买数量</span>
+          <van-stepper
+            class="stepper"
+            v-model="num"
+            min="1"
+            disable-input
+            input-width="40px"
+            button-size="32px"
+          />
+        </div>
+        <div class="submitBtn" @click="submit">确定</div>
+      </div>
+    </van-popup>
+  </div>
 </template>
 
 <script>
-import { GoodsAction, GoodsActionIcon, GoodsActionButton } from "vant";
+import {
+  GoodsAction,
+  GoodsActionIcon,
+  GoodsActionButton,
+  Popup,
+  Stepper,
+} from "vant";
 export default {
-  props: ["table"],
+  props: ["detail"],
   data() {
-    return {};
+    return {
+      imageUrl: this.$https.imageUrl,
+      show: false,
+      num: 1,
+      price: 0,
+      formData: [],
+      active: [],
+    };
   },
   components: {
     "van-goods-action": GoodsAction,
     "van-goods-action-icon": GoodsActionIcon,
     "van-goods-action-button": GoodsActionButton,
+    "van-popup": Popup,
+    "van-stepper": Stepper,
+  },
+  created() {},
+  mounted() {
+    console.log(this.detail);
+  },
+  methods: {
+    addCar() {
+      this.show = true;
+    },
+    closeAction() {
+      this.show = false;
+    },
+    pickParameter(index, items, indexs) {
+      this.formData[index] = items;
+      this.active[index] = indexs;
+      console.log(this.formData);
+      console.log(this.active[index]);
+    },
+    submit() {
+      let formCode = "";
+      for (let i in this.formData) {
+        formCode += this.formData[i].id;
+      }
+      let params = {
+        code: formCode,
+      };
+      let that = this;
+      this.$https.get(that.$api.common.getPrice, params).then((res) => {
+        console.log(res.data.data.price);
+      });
+    },
   },
 };
 </script>
 
 <style scoped lang="less">
+.popup-container {
+  position: relative;
+  padding: 60px 12.5px 10.5px;
+  box-sizing: border-box;
+  .popup-image {
+    height: 75px;
+    width: 75px;
+    position: absolute;
+    top: -20px;
+    left: 12.5px;
+    z-index: 100000;
+  }
+  .price {
+    position: absolute;
+    left: 97.5px;
+    top: 16.5px;
+    color: #da251c;
+    font-size: 17px;
+    font-weight: Bold;
+    &::before {
+      content: "￥";
+      font-size: 12px;
+      font-weight: 400;
+    }
+  }
+  .close {
+    height: 16.5px;
+    width: 16.5px;
+    position: absolute;
+    top: 16.5px;
+    right: 12.5px;
+  }
+  .scroll {
+    max-height: 300px;
+    overflow-y: auto;
+    .parameter {
+      margin-top: 15px;
+      .parameterTitle {
+        font-size: 14px;
+        color: #747474;
+      }
+      .parameterContent {
+        span {
+          display: inline-block;
+          padding: 8.5px 20px;
+          box-sizing: border-box;
+          border-radius: 5px;
+          text-align: center;
+          font-size: 12px;
+          color: #2c2c2c;
+          background-color: #f7f4f8;
+          margin-right: 10px;
+          margin-top: 10px;
+        }
+      }
+    }
+  }
+  .buyMun {
+    margin-top: 15px;
+    height: 40px;
+    align-items: center;
+    line-height: 40px;
+    span {
+      font-size: 14px;
+      color: #747474;
+      vertical-align: middle;
+    }
+    .stepper {
+      float: right;
+      vertical-align: middle;
+    }
+  }
+  .submitBtn {
+    width: 350px;
+    height: 44px;
+    line-height: 44px;
+    margin: auto;
+    color: #ffffff;
+    font-size: 16px;
+    text-align: center;
+    background-color: #da251c;
+    border-radius: 22px;
+    margin-top: 15px;
+  }
+}
+.itemsActive {
+  border: 1px solid #da251c;
+  background-color: #ffffff !important;
+  color: #da251c;
+}
+/deep/ .van-popup {
+  overflow-y: visible;
+}
+/deep/ .van-overlay {
+  background-color: rgba(0, 0, 0, 0.3);
+}
 </style>

@@ -14,7 +14,7 @@
         </div>
       </div>
     </div>
-    <hl-tab style="margin-top:10px;" :tab1="goodsDetail.goodsDetail.content" />
+    <hl-tab style="margin-top:10px;" v-if="goodsDetail.goodsDetail" :tab1="goodsDetail.goodsDetail.content" />
   </div>
 </template>
 

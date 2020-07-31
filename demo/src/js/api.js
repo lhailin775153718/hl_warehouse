@@ -12,6 +12,8 @@ const common = {
 
     goodsCategory: '/goods/goodsCategory/getList', //商品分类列表
     goodsCategoryList: '/goods/goodsCategory/getInfo', //获取分类详情
+
+    getPrice: '/goods/getPrice', //获取规格价格
 }
 
 export default {

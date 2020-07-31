@@ -3,22 +3,22 @@
     <hl-header :header="header"></hl-header>
     <div class="itemA">
       <div>
-        <span style="font-size: 30px">285</span>
-        <span style="font-size: 15px">分</span>
+        <span class="integralNum">285</span>
+        <span class="Company">分</span>
       </div>
     </div>
     <div class="itemB">
       <div class="block"></div>
-      <div>积分记录</div>
+      <div class="titleB">积分记录</div>
     </div>
     <div class="itemC">
       <div class="itemsList" v-for="(item, index) in itemsList" :key="index">
         <div class="blockA">
-          <div>{{item.name}}</div>
-          <div>{{item.date}}</div>
+          <div class="nameC">{{item.name}}</div>
+          <div class="timeC">{{item.date}}</div>
         </div>
         <div class="blockB">
-          <div>{{item.integral}}</div>
+          <div class="integralC">{{item.integral}}</div>
         </div>
       </div>
     </div>
@@ -27,72 +27,101 @@
 
 
 <script>
-  export default {
-    data() {
-      return {
-        header:{
-          title: '我的积分',
-          isLeftArrow: true,
-        },
-        itemsList: []
-      };
-    },
-    components: {
-      "hl-header": ()=> import("@/components/header"),
-    },
-    created() {
-      let  data = [
-        {name:'购物', integral: '+50', date: '2020/02/12'},
-        {name:'分享', integral: '+40', date: '2020/02/12'},
-        {name:'购物', integral: '+40', date: '2020/02/12'},
-        {name:'消费', integral: '-40', date: '2020/02/12'}
-      ]
-      this.itemsList = data
-    },
-    methods:{}
-  };
+export default {
+  data() {
+    return {
+      header: {
+        title: "我的积分",
+        isLeftArrow: true,
+      },
+      itemsList: [],
+    };
+  },
+  components: {
+    "hl-header": () => import("@/components/header"),
+  },
+  created() {
+    let data = [
+      { name: "购物", integral: "+50", date: "2020/02/12" },
+      { name: "分享", integral: "+40", date: "2020/02/12" },
+      { name: "购物", integral: "+40", date: "2020/02/12" },
+      { name: "消费", integral: "-40", date: "2020/02/12" },
+    ];
+    this.itemsList = data;
+  },
+  methods: {},
+};
 </script>
 <style scoped lang="less">
-  .integral{
+.integral {
+  width: 100%;
+  background-color: #ffffff;
+  .itemA {
+    width: 350px;
+    height: 120px;
+    border-radius: 10px;
+    background: #cf332e;
+    margin: auto;
+    margin-top: 12.5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #ffffff;
+    .integralNum {
+      font-size: 36px;
+      font-weight: bold;
+    }
+    .Company {
+      font-size: 12px;
+    }
+  }
+  .itemB {
+    display: flex;
+    align-items: center;
+    height: 30px;
+    margin-top: 30px;
+    margin-left: 12.5px;
+    .block {
+      width: 6px;
+      height: 21.5px;
+      background: #cf332e;
+      border-radius: 3px;
+    }
+    .titleB {
+      color: #000000;
+      font-size: 16px;
+      font-weight: bold;
+      margin-left: 7px;
+    }
+  }
+  .itemC {
     width: 100%;
-    .itemA {
-      width: 94%;
-      height: 110px;
-      border-radius: 20px;
-      background: red;
-      margin: auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #ffffff;
-    }
-    .itemB{
+    padding: 12.5px;
+    box-sizing: border-box;
+    .itemsList {
+      margin-top: 15px;
       display: flex;
       align-items: center;
-      height: 30px;
-      .block{
-        width: 10px;
-        height: 20px;
-        background: red;
+      .blockA {
+        flex: 1;
+        .nameC {
+          color: #747474;
+          font-size: 15px;
+        }
+        .timeC {
+          margin-top: 10px;
+          color: #949494;
+          font-size: 12px;
+        }
+        > div {
+          width: 100%;
+        }
       }
-    }
-    .itemC {
-      width: 100%;
-      .itemsList{
-        display: flex;
-        align-items: center;
-        .blockA{
-          flex: 1;
-          >div {
-            width: 100%;
-          }
-        }
-        .blockB{
-          font-size: 30px;
-        }
+      .blockB {
+        color: #2c2c2c;
+        font-size: 18px;
       }
     }
   }
-
-
+}
 </style>

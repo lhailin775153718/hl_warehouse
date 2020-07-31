@@ -9,18 +9,24 @@
       <div class="goodsProp">
         <span class="price">{{goodsDetail.price}}</span>
         <div class="goodsProp-right">
-          <span class="num">ÒÑÊÛ{{goodsDetail.sales}}¼þ</span>
+          <span class="num">å·²å”®{{goodsDetail.sales}}ä»¶</span>
           <img src="../../../static/image/follow-act.png" alt />
         </div>
       </div>
     </div>
-    <hl-tab style="margin-top:10px;" :tab1="goodsDetail.goodsDetail.content" />
+    <hl-tab
+      style="margin-top:10px;"
+      v-if="goodsDetail.goodsDetail"
+      :tab1="goodsDetail.goodsDetail.content"
+    />
+    <hl-goodsAction :detail="goodsDetail" />
   </div>
 </template>
 
 <script>
 import imgSwipe from "@/components/imgSwipe";
 import tab from "@/components/tab";
+import goodsAction from "@/components/goodsAction";
 export default {
   data() {
     return {
@@ -35,6 +41,7 @@ export default {
   components: {
     "img-swipe": imgSwipe,
     "hl-tab": tab,
+    "hl-goodsAction": goodsAction,
   },
   created() {
     this.getQuery();
@@ -97,7 +104,7 @@ export default {
       font-size: 20px;
       color: #da251c;
       &::before {
-        content: "£¤";
+        content: "ï¿¥";
         font-size: 13px;
       }
     }
