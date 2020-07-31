@@ -19,9 +19,11 @@
               <span
                 v-for="(items,indexs) in item.specProperties"
                 :key="indexs"
-                :class="{'itemsActive': active[index] == indexs}"
+                :class="{'itemsActive': items.id == active}"
                 @click="pickParameter(index,items,indexs)"
-              >{{items.propertyName}}</span>
+              >
+                {{items.propertyName}}
+              </span>
             </div>
           </div>
         </div>
@@ -59,7 +61,7 @@ export default {
       num: 1,
       price: 0,
       formData: [],
-      active: [],
+      active: '',
     };
   },
   components: {
@@ -82,7 +84,7 @@ export default {
     },
     pickParameter(index, items, indexs) {
       this.formData[index] = items;
-      this.active[index] = indexs;
+      this.active = items.id;
       console.log(this.formData);
       console.log(this.active[index]);
     },
