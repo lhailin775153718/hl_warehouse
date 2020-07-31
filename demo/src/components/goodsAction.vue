@@ -19,8 +19,8 @@
               <span
                 v-for="(items,indexs) in item.specProperties"
                 :key="indexs"
-                :class="{'itemsActive': items.id == active}"
-                @click="pickParameter(index,items,indexs)"
+                :class="{'itemsActive': items.select }"
+                @click="pickParameter(index,items,indexs, item)"
               >
                 {{items.propertyName}}
               </span>
@@ -45,161 +45,164 @@
 </template>
 
 <script>
-import {
-  GoodsAction,
-  GoodsActionIcon,
-  GoodsActionButton,
-  Popup,
-  Stepper,
-} from "vant";
-export default {
-  props: ["detail"],
-  data() {
-    return {
-      imageUrl: this.$https.imageUrl,
-      show: false,
-      num: 1,
-      price: 0,
-      formData: [],
-      active: '',
-    };
-  },
-  components: {
-    "van-goods-action": GoodsAction,
-    "van-goods-action-icon": GoodsActionIcon,
-    "van-goods-action-button": GoodsActionButton,
-    "van-popup": Popup,
-    "van-stepper": Stepper,
-  },
-  created() {},
-  mounted() {
-    console.log(this.detail);
-  },
-  methods: {
-    addCar() {
-      this.show = true;
-    },
-    closeAction() {
-      this.show = false;
-    },
-    pickParameter(index, items, indexs) {
-      this.formData[index] = items;
-      this.active = items.id;
-      console.log(this.formData);
-      console.log(this.active[index]);
-    },
-    submit() {
-      let formCode = "";
-      for (let i in this.formData) {
-        formCode += this.formData[i].id;
-      }
-      let params = {
-        code: formCode,
+  import {
+    GoodsAction,
+    GoodsActionIcon,
+    GoodsActionButton,
+    Popup,
+    Stepper,
+  } from "vant";
+  export default {
+    props: ["detail"],
+    data() {
+      return {
+        imageUrl: this.$https.imageUrl,
+        show: false,
+        num: 1,
+        price: 0,
+        formData: [],
+        active: {},
       };
-      let that = this;
-      this.$https.get(that.$api.common.getPrice, params).then((res) => {
-        console.log(res.data.data.price);
-      });
     },
-  },
-};
+    components: {
+      "van-goods-action": GoodsAction,
+      "van-goods-action-icon": GoodsActionIcon,
+      "van-goods-action-button": GoodsActionButton,
+      "van-popup": Popup,
+      "van-stepper": Stepper,
+    },
+    created() {
+
+    },
+    mounted() {
+    },
+    methods: {
+      addCar() {
+        this.show = true;
+      },
+      closeAction() {
+        this.show = false;
+      },
+      pickParameter(index, items, indexs, item) {
+        this.formData[index] = items;
+        item.specProperties.forEach(res => {
+          res.select = false
+        })
+        items.select = true
+
+      },
+      submit() {
+        let formCode = "";
+        for (let i in this.formData) {
+          formCode += this.formData[i].id;
+        }
+        let params = {
+          code: formCode,
+        };
+        let that = this;
+        this.$https.get(that.$api.common.getPrice, params).then((res) => {
+          console.log(res.data.data.price);
+        });
+      },
+    },
+  };
 </script>
 
 <style scoped lang="less">
-.popup-container {
-  position: relative;
-  padding: 60px 12.5px 10.5px;
-  box-sizing: border-box;
-  .popup-image {
-    height: 75px;
-    width: 75px;
-    position: absolute;
-    top: -20px;
-    left: 12.5px;
-    z-index: 100000;
-  }
-  .price {
-    position: absolute;
-    left: 97.5px;
-    top: 16.5px;
-    color: #da251c;
-    font-size: 17px;
-    font-weight: Bold;
-    &::before {
-      content: "￥";
-      font-size: 12px;
-      font-weight: 400;
+  .popup-container {
+    position: relative;
+    padding: 60px 12.5px 10.5px;
+    box-sizing: border-box;
+    .popup-image {
+      height: 75px;
+      width: 75px;
+      position: absolute;
+      top: -20px;
+      left: 12.5px;
+      z-index: 100000;
     }
-  }
-  .close {
-    height: 16.5px;
-    width: 16.5px;
-    position: absolute;
-    top: 16.5px;
-    right: 12.5px;
-  }
-  .scroll {
-    max-height: 300px;
-    overflow-y: auto;
-    .parameter {
-      margin-top: 15px;
-      .parameterTitle {
-        font-size: 14px;
-        color: #747474;
+    .price {
+      position: absolute;
+      left: 97.5px;
+      top: 16.5px;
+      color: #da251c;
+      font-size: 17px;
+      font-weight: Bold;
+      &::before {
+        content: "￥";
+        font-size: 12px;
+        font-weight: 400;
       }
-      .parameterContent {
-        span {
-          display: inline-block;
-          padding: 8.5px 20px;
-          box-sizing: border-box;
-          border-radius: 5px;
-          text-align: center;
-          font-size: 12px;
-          color: #2c2c2c;
-          background-color: #f7f4f8;
-          margin-right: 10px;
-          margin-top: 10px;
+    }
+    .close {
+      height: 16.5px;
+      width: 16.5px;
+      position: absolute;
+      top: 16.5px;
+      right: 12.5px;
+    }
+    .scroll {
+      max-height: 300px;
+      overflow-y: auto;
+      .parameter {
+        margin-top: 15px;
+        .parameterTitle {
+          font-size: 14px;
+          color: #747474;
+        }
+        .parameterContent {
+          span {
+            display: inline-block;
+            padding: 8.5px 20px;
+            box-sizing: border-box;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 12px;
+            color: #2c2c2c;
+            background-color: #f7f4f8;
+            margin-right: 10px;
+            margin-top: 10px;
+          }
         }
       }
     }
-  }
-  .buyMun {
-    margin-top: 15px;
-    height: 40px;
-    align-items: center;
-    line-height: 40px;
-    span {
-      font-size: 14px;
-      color: #747474;
-      vertical-align: middle;
+    .buyMun {
+      margin-top: 15px;
+      height: 40px;
+      align-items: center;
+      line-height: 40px;
+      span {
+        font-size: 14px;
+        color: #747474;
+        vertical-align: middle;
+      }
+      .stepper {
+        float: right;
+        vertical-align: middle;
+      }
     }
-    .stepper {
-      float: right;
-      vertical-align: middle;
+    .submitBtn {
+      width: 350px;
+      height: 44px;
+      line-height: 44px;
+      margin: auto;
+      color: #ffffff;
+      font-size: 16px;
+      text-align: center;
+      background-color: #da251c;
+      border-radius: 22px;
+      margin-top: 15px;
     }
   }
-  .submitBtn {
-    width: 350px;
-    height: 44px;
-    line-height: 44px;
-    margin: auto;
-    color: #ffffff;
-    font-size: 16px;
-    text-align: center;
-    background-color: #da251c;
-    border-radius: 22px;
-    margin-top: 15px;
+  .itemsActive {
+    border: 1px solid #da251c;
+    background-color: #ffffff !important;
+    color: #da251c;
   }
-}
-.itemsActive {
-  border: 1px solid #da251c;
-  background-color: #ffffff !important;
-  color: #da251c;
-}
-/deep/ .van-popup {
-  overflow-y: visible;
-}
-/deep/ .van-overlay {
-  background-color: rgba(0, 0, 0, 0.3);
-}
+  /deep/ .van-popup {
+    overflow-y: visible;
+  }
+  /deep/ .van-overlay {
+    background-color: rgba(0, 0, 0, 0.3);
+  }
 </style>
