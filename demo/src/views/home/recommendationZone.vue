@@ -127,7 +127,7 @@ export default {
             this.list = this.$commonFn.scrollPushFn(this.list, array);
           }
           this.listInfo = res;
-          
+
           if (this.selectForm.page == res.data.data.pages) {
             this.finished.state = true;
           } else {
@@ -138,10 +138,13 @@ export default {
         });
     },
     toDetail(val) {
+      // console.log(this.$qs.stringify(val))
+      console.log(JSON.stringify(val))
       this.$router.push({
         path: "commodityDetail",
         query: {
-          obj: val,
+          // obj: this.$qs.stringify(val),
+          obj: JSON.stringify(val),
         },
       });
     },

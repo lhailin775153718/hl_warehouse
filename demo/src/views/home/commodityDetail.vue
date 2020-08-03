@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     getQuery() {
-      this.dataInfo = this.$route.query.obj;
+      this.dataInfo = JSON.parse(this.$route.query.obj)
     },
     getDetail() {
       let params = {

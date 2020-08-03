@@ -8,7 +8,7 @@ import Https from './js/https'
 import Storage from './js/storage'
 import Api from './js/api'
 import CommonFn from './js/commonFn'
-
+import qs from 'qs'
 
 // import Vant from 'vant';
 import 'vant/lib/index.css';
@@ -21,6 +21,7 @@ Vue.use(Lazyload, {
 
 
 Vue.prototype.$https = Https;
+Vue.prototype.$qs = qs;
 Vue.prototype.$storage = Storage;
 Vue.prototype.$api = Api;
 Vue.prototype.$commonFn = CommonFn;
