@@ -1,51 +1,61 @@
 <template>
-  <div class="recommend">
-    <div
-      class="recommend-item"
-      :class="{'recommendFirst':index == 0 || index == 1}"
-      v-for="(item,index) in recommend"
-      :key="index"
-      @click="toDetail(item)"
-    >
-      <img class="recommend-item-image" :src="imageUrl + item.image" />
-      <div class="recommend-item-content">
-        <p>{{item.goodsName}}</p>
-        <span class="contentPrice">
-          <span class="Currency">￥</span>
-          {{item.price}}
-        </span>
-        <img class="contentImage" src="../../static/image/carLogo.png" />
+  <van-list
+    ref="listloading"
+    v-model="loading"
+    :finished="finished"
+    finished-text="没有更多了"
+    @load="onload"
+  >
+    <div class="recommend">
+      <div
+        class="recommend-item"
+        :class="{'recommendFirst':index == 0 || index == 1}"
+        v-for="(item,index) in recommend"
+        :key="index"
+        @click="toDetail(item)"
+      >
+        <img class="recommend-item-image" :src="imageUrl + item.image" />
+        <div class="recommend-item-content">
+          <p>{{item.goodsName}}</p>
+          <span class="contentPrice">
+            <span class="Currency">￥</span>
+            {{item.price}}
+          </span>
+          <img class="contentImage" src="../../static/image/carLogo.png" />
+        </div>
       </div>
     </div>
-  </div>
+  </van-list>
 </template>
 
 <script>
-import { Progress } from "vant";
+import { Progress, List } from "vant";
 export default {
-  /**
-   * title:标题
-   * leftText:左边文本
-   * rightText:右边文本
-   * isLeftArrow:是否有返回箭头
-   */
   props: [],
   data() {
     return {
       imageUrl: this.$https.imageUrl,
       recommend: [],
+      listInfo: [],
       selectInfo: {
         page: 1,
-        pageSize: 10,
+        pageSize: 2,
         sort: "sales",
       },
+      finished: false,
+      loading: false,
+      count: 0,
     };
   },
   components: {
     "van-progress": Progress,
+    "van-list": List,
   },
   created() {
     this.getGoodsList();
+  },
+  mounted() {
+    this.$refs.listloading.check();
   },
   methods: {
     getGoodsList() {
@@ -53,7 +63,13 @@ export default {
       this.$https
         .get(that.$api.common.GoodsList, that.selectInfo)
         .then((res) => {
-          this.recommend = res.data.data.records;
+          // if (this.selectInfo.page < 5) {
+          //   this.loading = false;
+          // }
+
+          let array = res.data.data.records;
+          this.recommend.push(...array);
+          this.count = res.data.data.pages;
         });
     },
     toDetail(val) {
@@ -63,6 +79,10 @@ export default {
           obj: val,
         },
       });
+    },
+    onload() {
+      this.selectInfo.page++;
+      this.getGoodsList();
     },
   },
 };

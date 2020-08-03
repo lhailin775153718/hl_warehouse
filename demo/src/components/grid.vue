@@ -31,13 +31,14 @@ export default {
   },
   methods: {
     toPage(val) {
-      this.$router.push({
-        path: val.path,
-        query: {
-          text: val.text,
-          type: val.type,
-        },
-      });
+      this.$emit("toPage", val);
+      // this.$router.push({
+      //   path: val.path,
+      //   query: {
+      //     text: val.text,
+      //     type: val.type,
+      //   },
+      // });
     },
   },
 };

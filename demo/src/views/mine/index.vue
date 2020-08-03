@@ -5,7 +5,7 @@
         <div class="title">我的</div>
         <div class="img"></div>
       </div>
-      <div class="head">
+      <div class="head" @click="toPage('/personal')">
         <div class="img"></div>
         <div class="itemA">
           <div class="itemB">
@@ -39,15 +39,15 @@
       <hl-grid :grid="grid" :columnNum="columnNum" />
     </div>
     <van-cell-group>
-      <van-cell title="佣金玩法" is-link center icon="../../../static/image/yongjin.png" />
-      <van-cell title="我的优惠券" is-link center icon="../../../static/image/youhuiquan.png" />
-      <van-cell title="我的收藏" is-link center icon="../../../static/image/follow-act.png" />
-      <van-cell title="银行卡管理" is-link center icon="../../../static/image/yinhangka.png" />
-      <van-cell title="地址管理" is-link center icon="../../../static/image/dizhi.png" />
+      <van-cell title="佣金玩法" @click="toPage('/commission')" is-link center icon="../../../static/image/yongjin.png" />
+      <van-cell title="我的优惠券" @click="toPage('/coupon')" is-link center icon="../../../static/image/youhuiquan.png" />
+      <van-cell title="我的收藏" @click="toPage('/collect')" is-link center icon="../../../static/image/follow-act.png" />
+      <van-cell title="银行卡管理" @click="toPage('/bankCard')" is-link center icon="../../../static/image/yinhangka.png" />
+      <van-cell title="地址管理" @click="toPage('/addressList')" is-link center icon="../../../static/image/dizhi.png" />
     </van-cell-group>
     <van-cell-group>
-      <van-cell title="帮助中心" is-link center icon="../../../static/image/bangzhu.png" />
-      <van-cell title="关于我们" is-link center icon="../../../static/image/guanyuwomen.png" />
+      <van-cell title="帮助中心" @click="toPage('/commission')" is-link center icon="../../../static/image/bangzhu.png" />
+      <van-cell title="关于我们" @click="toPage('/commission')" is-link center icon="../../../static/image/guanyuwomen.png" />
     </van-cell-group>
   </div>
 </template>

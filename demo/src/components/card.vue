@@ -139,6 +139,13 @@ export default {
       });
     },
     submit() {
+      this.$router.push({
+        path: "confirmOrder",
+        query: {
+          order: this.list,
+        },
+      });
+      return;
       let arr = [];
       this.list.forEach((item) => {
         item.shoppingCarGoodsList.forEach((res) => {
@@ -154,6 +161,9 @@ export default {
       let that = this;
       this.$https.post(that.$api.common.settlement, params).then((res) => {
         console.log(res);
+        this.$router.push({
+          path: "confirmOrder",
+        });
       });
     },
   },

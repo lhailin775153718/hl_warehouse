@@ -17,31 +17,39 @@
     <div style="margin-top:1px;">
       <hl-screening :selectForm="selectForm" />
     </div>
-
-    <div class="list">
-      <div
-        class="item"
-        :class="{'item-active':index == 0}"
-        v-for="(item,index) in list"
-        :key="index"
-        @click="toDetail(item)"
+    <van-pull-refresh :disabled="disabled" v-model="refreshing" @refresh="onRefresh">
+      <van-list
+        v-model="loading"
+        :finished="finished.state"
+        :finished-text="finished.text"
+        @load="getActivityList"
       >
-        <img class="itemImage" :src="imageUrl + item.image" alt />
-        <div class="itemRight">
-          <p class="itemTitle">{{item.goodsName}}</p>
-          <span class="itemNum">{{item.sales}}</span>
-          <span class="itemPirce">{{item.price}}</span>
-          <img class="itemIcon" src="../../../static/image/carLogo.png" alt />
+        <div class="list">
+          <div
+            class="item"
+            :class="{'item-active':index == 0}"
+            v-for="(item,index) in list"
+            :key="index"
+            @click="toDetail(item)"
+          >
+            <img class="itemImage" :src="imageUrl + item.image" alt />
+            <div class="itemRight">
+              <p class="itemTitle">{{item.goodsName}}</p>
+              <span class="itemNum">{{item.sales}}</span>
+              <span class="itemPirce">{{item.price}}</span>
+              <img class="itemIcon" src="../../../static/image/carLogo.png" alt />
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </van-list>
+    </van-pull-refresh>
   </div>
 </template>
 
 <script>
 import header from "@/components/header";
 import screening from "@/components/screening";
-import { Search } from "vant";
+import { Search, PullRefresh, List } from "vant";
 import searchHistory from "@/components/searchHistory";
 export default {
   data() {
@@ -56,10 +64,18 @@ export default {
       selectData: "",
       isSearch: false,
       list: [],
+      listInfo: [],
       selectForm: {
         page: 1,
-        pageSize: 20,
+        pageSize: 10,
       },
+      disabled: false,
+      finished: {
+        state: false,
+        text: "没有更多了",
+      },
+      loading: false,
+      refreshing: false,
     };
   },
   components: {
@@ -67,10 +83,11 @@ export default {
     "van-search": Search,
     "hl-screening": screening,
     "hl-searchHistory": searchHistory,
+    "van-pull-refresh": PullRefresh,
+    "van-list": List,
   },
   created() {
     this.getQuery();
-    this.getActivityList();
   },
   methods: {
     getQuery() {
@@ -91,6 +108,14 @@ export default {
       if (this.isLoading) {
         return;
       }
+
+      if (this.listInfo.length > 0) {
+        if (this.selectForm.page == this.listInfo.data.data.pages) {
+          this.finished.state = true;
+          return;
+        }
+      }
+
       let params = this.selectForm;
       params.goodsName = this.selectInfo;
       let that = this;
@@ -101,6 +126,14 @@ export default {
           if (array.length > 0) {
             this.list = this.$commonFn.scrollPushFn(this.list, array);
           }
+          this.listInfo = res;
+          
+          if (this.selectForm.page == res.data.data.pages) {
+            this.finished.state = true;
+          } else {
+            this.selectForm.page = this.selectForm.page++;
+          }
+
           this.isLoading = false;
         });
     },
@@ -115,7 +148,6 @@ export default {
     onSearch(val) {
       this.selectInfo = val;
       this.isSearch = false;
-      console.log("成功");
       this.getActivityList();
     },
     showSearch() {
@@ -124,6 +156,14 @@ export default {
     },
     cancelSearch() {
       this.isSearch = false;
+    },
+    onRefresh() {
+      if (this.refreshing) {
+        this.list = [];
+        this.refreshing = false;
+      }
+      this.selectForm.page = 1;
+      this.getActivityList();
     },
   },
 };

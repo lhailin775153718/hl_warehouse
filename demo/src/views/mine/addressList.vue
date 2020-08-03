@@ -1,11 +1,18 @@
 <template>
   <div>
-    <hl-header :header="header"></hl-header>
+    <van-nav-bar
+      :title="header.title"
+      :left-text="header.leftText"
+      :right-text="header.rightText"
+      :left-arrow="header.isLeftArrow"
+      @click-left="onClickLeft"
+      @click-right="onClickRight"
+    />
     <van-address-list
       v-model="chosenAddressId"
       :list="list"
       default-tag-text="默认"
-      @add="onAdd"
+      @add="toPage"
       @edit="onEdit"
     />
   </div>
@@ -13,14 +20,15 @@
 
 
 <script>
-import { AddressList } from "vant";
+import { NavBar, AddressList } from "vant";
 import header from "@/components/header";
+import Bus from "@/js/bus.js";
 export default {
   data() {
     return {
       header: {
         title: "收货地址",
-        isLeftArrow: true
+        isLeftArrow: true,
       },
       chosenAddressId: "1",
       list: [
@@ -29,29 +37,39 @@ export default {
           name: "张三",
           tel: "13000000000",
           address: "浙江省杭州市西湖区文三路 138 号东方通信大厦 7 楼 501 室",
-          isDefault: true
+          isDefault: true,
         },
         {
           id: "2",
           name: "李四",
           tel: "1310000000",
-          address: "浙江省杭州市拱墅区莫干山路 50 号"
-        }
-      ]
+          address: "浙江省杭州市拱墅区莫干山路 50 号",
+        },
+      ],
     };
   },
   components: {
-    "hl-header": header,
-    "van-address-list": AddressList
+    "van-nav-bar": NavBar,
+    "van-address-list": AddressList,
   },
   methods: {
-    onAdd() {
-      console.log("新增地址");
+    toPage(val) {
+      this.$router.push({
+        path: "/addressEdit",
+        query: {
+          address: val,
+        },
+      });
     },
     onEdit(item, index) {
       console.log("编辑地址:" + index);
-    }
-  }
+    },
+    onClickLeft() {
+      Bus.$emit("targetData", "123");
+      this.$router.go(-1);
+    },
+    onClickRight() {},
+  },
 };
 </script>
 

@@ -20,7 +20,11 @@ const goodsDetailComponent = resolve => require(['@/views/home/goodsDetail'], re
 //sort
 const goodsCategoryListComponent = resolve => require(['@/views/sort/goodsCategoryList'], resolve) //商品详情页
 
+//car
+const confirmOrderComponent = resolve => require(['@/views/car/confirmOrder'], resolve) //确认订单
+
 //mine
+const personalComponent = resolve => require(['@/views/mine/personal'], resolve) //个人信息
 const helpCentreComponent = resolve => require(['@/views/mine/helpCentre'], resolve) //帮助中心
 const addressEditComponent = resolve => require(['@/views/mine/addressEdit'], resolve) //地址编辑
 const viewLogisticsComponent = resolve => require(['@/views/mine/viewLogistics'], resolve) //查看物流
@@ -54,6 +58,10 @@ const router = new Router({
         { path: '/goodsCategoryList', component: goodsCategoryListComponent },
 
 
+        { path: '/confirmOrder', component: confirmOrderComponent },
+
+
+        { path: '/personal', component: personalComponent },
         { path: '/helpCentre', component: helpCentreComponent },
         { path: '/addressEdit', component: addressEditComponent },
         { path: '/viewLogistics', component: viewLogisticsComponent },

@@ -22,6 +22,7 @@
 <script>
 import divider from "@/components/divider";
 // import Storage from "@/js/storage.js";
+import axios from "axios";
 export default {
   data() {
     return {
@@ -37,33 +38,6 @@ export default {
   },
   methods: {
     getCode() {
-      let params = {
-        phone: this.phoneNumber,
-      };
-      let that = this;
-      this.$https.get(that.$api.common.getCode, params).then((res) => {
-        console.log(res);
-      });
-    },
-    login() {
-      let params = {
-        loginName: this.phoneNumber,
-        checkCode: this.code,
-      };
-      let that = this;
-      this.$https.post(that.$api.common.login, params).then((res) => {
-        that.$storage.setItem("userInfo", res.data.data);
-        that.$router.push({
-          path: "/home",
-        });
-      });
-    },
-    register() {
-      this.$router.push({
-        path: "/register",
-      });
-    },
-    getCode() {
       const TIME_COUNT = 60;
       if (!this.timer) {
         this.count = TIME_COUNT;
@@ -78,6 +52,47 @@ export default {
           }
         }, 1000);
       }
+
+      let params = {
+        phone: this.phoneNumber,
+      };
+      let that = this;
+      axios({
+        url: "http://shopkeeper.gdkeyong.com/api" + that.$api.common.getCode,
+        method: "get",
+        params: params,
+      }).then((res) => {});
+      // this.$https.get(that.$api.common.getCode, params).then((res) => {
+      //   console.log(res);
+      // });
+    },
+    login() {
+      let params = {
+        loginName: this.phoneNumber,
+        checkCode: this.code,
+      };
+      let that = this;
+      axios({
+        url: "http://shopkeeper.gdkeyong.com/api" + that.$api.common.login,
+        method: "post",
+        data: params,
+      }).then((res) => {
+        that.$storage.setItem("userInfo", res.data.data);
+        that.$router.push({
+          path: "/home",
+        });
+      });
+      // this.$https.post(that.$api.common.login, params).then((res) => {
+      //   that.$storage.setItem("userInfo", res.data.data);
+      //   that.$router.push({
+      //     path: "/home",
+      //   });
+      // });
+    },
+    register() {
+      this.$router.push({
+        path: "/register",
+      });
     },
   },
 };

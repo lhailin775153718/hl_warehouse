@@ -18,6 +18,10 @@ const common = {
     getShopCar: '/order/shoppingCar/getInfo', //获取购物车详情
     carAddNum: '/order/shoppingCar/addNum', //购物车商品数量增加
     settlement: '/order/shoppingCar/settlement', //购物车结算
+
+    addOrUpdate: '/user/userAddress/addOrUpdate', //新增&编辑地址
+
+    getAllArea: '//system/Area/getAllArea', //获取所有区域
 }
 
 export default {

@@ -14,7 +14,7 @@
       v-if="isSearch"
     />
     <img-swipe :images="imageList" :swipeData="swipeData" />
-    <hl-grid :grid="grid" :columnNum="columnNum" />
+    <hl-grid :grid="grid" :columnNum="columnNum" @toPage="toPage" />
     <hl-deadline />
     <div class="recommendTitle">
       <img src="../../../static/image/carLogo.png" />
@@ -107,6 +107,15 @@ export default {
     },
     cancelSearch() {
       this.isSearch = false;
+    },
+    toPage(val) {
+      this.$router.push({
+        path: val.path,
+        query: {
+          text: val.text,
+          type: val.type,
+        },
+      });
     },
   },
 };
