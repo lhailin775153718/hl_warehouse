@@ -57,7 +57,8 @@
       />
       <span class="total-checkBoxText">全选</span>
       <span class="total-price">
-        <span class="total-Currency">￥</span>66.00
+        <span class="total-Currency">￥</span>
+        {{price}}
       </span>
       <div class="total-btn" @click="submit">去结算</div>
     </div>
@@ -80,6 +81,19 @@ export default {
   },
   components: {
     "van-stepper": Stepper,
+  },
+  computed: {
+    price() {
+      let total = 0;
+      this.list.forEach((res) => {
+        res.shoppingCarGoodsList.forEach((res1) => {
+          if (res1.checked) {
+            total += res1.number * res1.unitPrice;
+          }
+        });
+      });
+      return total;
+    },
   },
   created() {
     this.getShopCar();
@@ -142,7 +156,7 @@ export default {
       this.$router.push({
         path: "confirmOrder",
         query: {
-          order: this.list,
+          order: JSON.stringify(this.list),
         },
       });
       return;
@@ -165,6 +179,9 @@ export default {
           path: "confirmOrder",
         });
       });
+    },
+    getList() {
+      return this.list;
     },
   },
 };

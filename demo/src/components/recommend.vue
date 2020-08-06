@@ -39,12 +39,11 @@ export default {
       listInfo: [],
       selectInfo: {
         page: 1,
-        pageSize: 2,
+        pageSize: 10,
         sort: "sales",
       },
       finished: false,
       loading: false,
-      count: 0,
     };
   },
   components: {
@@ -54,29 +53,28 @@ export default {
   created() {
     this.getGoodsList();
   },
-  mounted() {
-    this.$refs.listloading.check();
-  },
   methods: {
     getGoodsList() {
       let that = this;
       this.$https
         .get(that.$api.common.GoodsList, that.selectInfo)
         .then((res) => {
-          // if (this.selectInfo.page < 5) {
-          //   this.loading = false;
-          // }
-
           let array = res.data.data.records;
           this.recommend.push(...array);
           this.count = res.data.data.pages;
+
+          if (this.selectInfo.page < res.data.data.pages) {
+            this.loading = false;
+          } else {
+            this.finished = true;
+          }
         });
     },
     toDetail(val) {
       this.$router.push({
         path: "goodsDetail",
         query: {
-          obj: val,
+          obj: JSON.stringify(val),
         },
       });
     },

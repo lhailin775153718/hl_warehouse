@@ -1,7 +1,7 @@
 <template>
   <div>
-    <hl-header :header="header"></hl-header>
-    <hl-card />
+    <hl-header :header="header" @onClickRight="onClickRight"></hl-header>
+    <hl-card ref="card" />
   </div>
 </template>
 
@@ -13,14 +13,35 @@ export default {
     return {
       header: {
         title: "购物车",
-        rightText: "删除"
-      }
+        rightText: "删除",
+      },
     };
   },
   components: {
     "hl-header": header,
-    "hl-card": card
-  }
+    "hl-card": card,
+  },
+  methods: {
+    onClickRight() {
+      let list = this.$refs.card.getList();
+      let arr = [];
+      list.forEach((res) => {
+        res.shoppingCarGoodsList.forEach((res1) => {
+          if (res1.checked) {
+            arr.push(res1.id);
+          }
+        });
+      });
+      let params = {
+        carId: arr,
+        userCode: this.$storage.getItem("userInfo").userCode,
+      };
+      let that = this;
+      this.$https.post(that.$api.common.delCarGoods, params).then((res) => {
+        that.$refs.card.getShopCar();
+      });
+    },
+  },
 };
 </script>
 

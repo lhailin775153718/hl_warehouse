@@ -2,8 +2,11 @@
   <main style="position:relative">
     <van-dropdown-menu>
       <van-dropdown-item v-model="value1" :options="option1" />
-      <van-dropdown-item v-model="value2" :options="option2" />
+      <!-- <van-dropdown-item v-model="value2" :options="option2" /> -->
     </van-dropdown-menu>
+    <div class="screen" style="right:33.33%;">
+      <span class="screenText">价格</span>
+    </div>
     <div class="screen" @click="showPopup">
       <span class="screenText">筛选</span>
       <img class="screenIcon" src="../../static/image/carLogo1.png" alt />
@@ -13,7 +16,12 @@
       <div class="popupContainer" v-for="(item,index) in popup" :key="index">
         <span class="itemType">{{item.type}}</span>
         <div class="itemOpt">
-          <div v-for="(items,indexs) in item.opt" :key="indexs">{{items.categoryName}}</div>
+          <div
+            :class="{'active':items.checked}"
+            v-for="(items,indexs) in item.opt"
+            :key="indexs"
+            @click="screening(item,items)"
+          >{{items.categoryName}}</div>
         </div>
       </div>
       <div class="reset">重置</div>
@@ -78,8 +86,11 @@ export default {
         console.log(this.popup);
       });
     },
-    onConfirm() {
-      this.$refs.item.toggle();
+    screening(item, items) {
+      item.opt.forEach((res) => {
+        res.checked = false;
+      });
+      items.checked = true;
     },
     showPopup() {
       this.show = true;
@@ -90,7 +101,7 @@ export default {
 
 <style scoped lang="less">
 /deep/ .van-dropdown-menu {
-  width: 66.66%;
+  width: 33.33%;
 }
 /deep/.van-dropdown-menu__item--disabled .van-dropdown-menu__title {
   color: #323233;
@@ -155,7 +166,7 @@ export default {
   position: absolute;
   right: 50%;
   bottom: 37.5px;
-  background-color: #FF6800;
+  background-color: #ff6800;
   border-top-left-radius: 15px;
   border-bottom-left-radius: 15px;
   color: #ffffff;
@@ -169,7 +180,7 @@ export default {
   position: absolute;
   left: 50%;
   bottom: 37.5px;
-  background-color: #DB2016;
+  background-color: #db2016;
   border-top-right-radius: 15px;
   border-bottom-right-radius: 15px;
   color: #ffffff;
@@ -178,5 +189,9 @@ export default {
   line-height: 30px;
   width: 80px;
   text-align: center;
+}
+.active {
+  background-color: #fff7f7 !important;
+  color: #e04038;
 }
 </style>

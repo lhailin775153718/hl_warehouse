@@ -3,24 +3,30 @@
     <van-nav-bar
       :title="header.title"
       :left-text="header.leftText"
-      :right-text="header.rightText"
       :left-arrow="header.isLeftArrow"
       @click-left="onClickLeft"
-      @click-right="onClickRight"
     />
-    <van-address-list
-      v-model="chosenAddressId"
-      :list="list"
-      default-tag-text="默认"
-      @add="toPage"
-      @edit="onEdit"
-    />
+    <div class="addressItem" v-for="item in list" :key="item.id" @click="pickAddress(item)">
+      <div class="itemLeft">
+        <div class="itemLeftTop">
+          <div class="name">{{item.receiver}}</div>
+          <div class="phone">{{item.phone}}</div>
+          <div class="tags" v-if="item.isDefault">默认</div>
+        </div>
+        <div
+          class="itemLeftBottom"
+        >{{item.provinceName + item.cityName + item.districtName + item.detail}}</div>
+      </div>
+      <div class="itemRight" @click="toPage(item)"></div>
+    </div>
+
+    <div class="btn" @click="toPage">新增地址</div>
   </div>
 </template>
 
 
 <script>
-import { NavBar, AddressList } from "vant";
+import { NavBar } from "vant";
 import header from "@/components/header";
 import Bus from "@/js/bus.js";
 export default {
@@ -31,54 +37,111 @@ export default {
         isLeftArrow: true,
       },
       chosenAddressId: "1",
-      list: [
-        {
-          id: "1",
-          name: "张三",
-          tel: "13000000000",
-          address: "浙江省杭州市西湖区文三路 138 号东方通信大厦 7 楼 501 室",
-          isDefault: true,
-        },
-        {
-          id: "2",
-          name: "李四",
-          tel: "1310000000",
-          address: "浙江省杭州市拱墅区莫干山路 50 号",
-        },
-      ],
+      list: [],
+      selectForm: {
+        userCode: this.$storage.getItem("userInfo").userCode,
+        page: 1,
+        pageSize: 10,
+      },
     };
   },
   components: {
     "van-nav-bar": NavBar,
-    "van-address-list": AddressList,
+  },
+  created() {
+    this.getAddressList();
   },
   methods: {
+    getAddressList() {
+      let that = this;
+      this.$https
+        .get(that.$api.common.getUserAddress, that.selectForm)
+        .then((res) => {
+          console.log(res);
+          let array = res.data.data.records;
+          this.list.push(...array);
+        });
+    },
     toPage(val) {
       this.$router.push({
         path: "/addressEdit",
         query: {
-          address: val,
+          address: JSON.stringify(val),
         },
       });
     },
-    onEdit(item, index) {
-      console.log("编辑地址:" + index);
-    },
     onClickLeft() {
-      Bus.$emit("targetData", "123");
       this.$router.go(-1);
     },
-    onClickRight() {},
+    pickAddress(item) {
+      let isOrder = this.$route.query.isOrder;
+      if (isOrder) {
+        this.$storage.setItem("address", JSON.stringify(item));
+        this.$router.go(-1);
+      }
+    },
   },
 };
 </script>
 
 <style lang="less" scoped>
-/deep/ .van-radio__icon {
-  display: none;
+.addressItem {
+  width: 355px;
+  margin: auto;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ffffff;
+  padding: 12px 0;
+  box-sizing: border-box;
+  border-radius: 5px;
+  .itemLeft {
+    width: 280px;
+    color: #2c2c2c;
+    .itemLeftTop {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      .phone {
+        margin-left: 20px;
+      }
+      .tags {
+        color: #ffffff;
+        background-color: #cf332e;
+        font-size: 10px;
+        text-align: center;
+        height: 18.5px;
+        line-height: 18.5px;
+        width: 30px;
+        border-radius: 3px;
+        margin-left: 15px;
+      }
+    }
+    .itemLeftBottom {
+      font-size: 15px;
+      margin-top: 5px;
+    }
+  }
+  .itemRight {
+    background-image: url("../../../static/image/addressEdit.png");
+    background-size: 100% 100%;
+    height: 20.5px;
+    width: 20.5px;
+    margin-left: 15px;
+  }
 }
-// /deep/ .van-address-item__edit {
-//   background-image: url("../../../static/image/carLogo1.png");
-//   background-size: 100% 100%;
-// }
+
+.btn {
+  height: 40px;
+  line-height: 40px;
+  width: 350px;
+  margin: auto;
+  margin-top: 30px;
+  border-radius: 20px;
+  background-color: #d8674d;
+  text-align: center;
+  color: #ffffff;
+  font-size: 17px;
+}
 </style>

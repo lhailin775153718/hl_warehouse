@@ -4,8 +4,10 @@
     <div class="itemB flex_c_sb" @click="pickAddress">
       <div class="blockA img"></div>
       <div class="blockB">
-        <div>{{address.name}} {{address.phone}}</div>
-        <div class="address">地址:{{address.address}}</div>
+        <div>{{address.receiver}} {{address.phone}}</div>
+        <div
+          class="address"
+        >地址:{{address.provinceName + address.cityName + address.districtName + address.detail}}</div>
       </div>
       <div class="blockA img2"></div>
     </div>
@@ -16,32 +18,33 @@
         <div class="title">{{item.shopName}}</div>
       </div>
       <div class="commodity flex_c_sb" v-for="items in item.shoppingCarGoodsList" :key="items.id">
-        <!-- <div v-if="items.checked"> -->
-        <img class="img" :src="imageUrl + items.goodsImage" />
-        <div class="content">
-          <div class="name">{{items.goodsName}}</div>
-          <div class="price flex_c_sb">
-            <div class="oprice">{{items.price}}</div>
-            <!-- <div class="num">x {{items.number}}</div> -->
-            <van-stepper
-              class="num stepper"
-              v-model="items.number"
-              min="1"
-              disable-input
-              input-width="35px"
-              button-size="25px"
-              @plus="plus(items)"
-              @minus="minus(items)"
-            />
+        <div style="width:100%;">
+          <div class="flex_c_sb">
+            <img class="img" :src="imageUrl + items.goodsImage" />
+            <div class="content">
+              <div class="name">{{items.goodsName}}</div>
+              <div class="price flex_c_sb">
+                <div class="oprice">{{items.price}}</div>
+                <div class="num">x {{items.number}}</div>
+              </div>
+            </div>
+          </div>
+          <div class="itemC">
+            <textarea placeholder="给卖家留言..."></textarea>
+          </div>
+
+          <div class="itemD">
+            <div class="itemPrice" style="text-align: right">
+              <span>共{{items.number}}件商品,合计</span>
+              ￥{{items.price}}
+            </div>
           </div>
         </div>
-        <!-- </div> -->
       </div>
     </div>
 
-    <div class="itemC">
+    <!-- <div class="itemC">
       <textarea placeholder="给卖家留言..."></textarea>
-      <!-- <div>{{orderData.beizhu}}</div> -->
     </div>
 
     <div class="itemD">
@@ -53,30 +56,30 @@
         <span>共{{count}}件商品,合计</span>
         ￥{{price}}
       </div>
-    </div>
+    </div>-->
 
     <van-cell-group style="margin-top:10px;">
-      <van-cell title="支付方式" is-link center />
+      <van-cell title="支付方式" :value="pay" is-link center @click="toPage('/payment')" />
       <van-cell title="可以用500金币抵￥5.00" center>
         <template #right-icon>
           <van-switch v-model="checked" size="20" active-color="#D8674D" inactive-color="#f5f5f5" />
         </template>
       </van-cell>
-      <van-cell title="优惠券" is-link center />
+      <!-- <van-cell title="优惠券" is-link center /> -->
     </van-cell-group>
 
     <van-cell-group style="margin-top:10px;margin-bottom:70px;">
-      <van-cell title="商品金额" value="100" center />
-      <van-cell title="+运费" value="7" center></van-cell>
-      <van-cell title="-优惠券折扣" value="6" center />
+      <van-cell title="商品金额" :value="'￥' + price" center />
+      <!-- <van-cell title="+运费" value="7" center></van-cell> -->
+      <van-cell title="-优惠券折扣" :value="count" center />
     </van-cell-group>
 
     <div class="footer">
       <span class="span1">共{{count}}件,</span>
       <span class="span2">合计:</span>
       <span class="span3">￥</span>
-      <span class="price">100.00</span>
-      <div class="submitOrder">提交订单</div>
+      <span class="price">{{price-count}}</span>
+      <div class="submitOrder" @click="submitOrder">提交订单</div>
     </div>
   </div>
 </template>
@@ -94,14 +97,16 @@ export default {
         isLeftArrow: true,
       },
       orderData: {},
-      address: {
-        name: "涨三",
-        phone: "18825060396",
-        address: "广东省广州市",
-      },
-      count: 2,
-      price: 10000,
+      address: {},
+      count: 0,
+      price: 0,
       checked: false,
+      selectForm: {
+        userCode: this.$storage.getItem("userInfo").userCode,
+        page: 1,
+        pageSize: 1,
+      },
+      pay: "",
     };
   },
   components: {
@@ -112,48 +117,64 @@ export default {
     "van-switch": Switch,
   },
   created() {
-    this.orderData = this.$route.query.order;
-    let temp = [];
-    this.orderData.forEach((item) => {
-      item.shoppingCarGoodsList.forEach((res) => {
-        if (res.checked) {
-          temp.push(item);
-        }
-      });
-    });
-    this.orderData = temp;
-
-    Bus.$on(
-      "targetData",
-      function (data) {
-        //赋值给当前页面的值
-        console.log(data);
-      }.bind(this)
-    );
+    this.getQuery();
+    this.initialize();
+    this.getAddress();
   },
   methods: {
+    getQuery() {
+      this.orderData = JSON.parse(this.$route.query.order);
+      let temp = [];
+      this.orderData.forEach((item) => {
+        item.shoppingCarGoodsList.forEach((res) => {
+          if (res.checked) {
+            temp.push(item);
+          }
+        });
+      });
+      this.orderData = temp;
+    },
+    initialize() {
+      this.orderData.forEach((res) => {
+        res.shoppingCarGoodsList.forEach((res1) => {
+          this.price += res1.price;
+          this.count += res1.number;
+        });
+      });
+      this.pay = this.$storage.getItem("pay");
+    },
+    getAddress() {
+      let address = JSON.parse(this.$storage.getItem("address"));
+      if (address != null) {
+        this.address = address;
+      } else {
+        let that = this;
+        this.$https
+          .get(that.$api.common.getUserAddress, that.selectForm)
+          .then((res) => {
+            this.address = res.data.data.records[0];
+          });
+      }
+    },
+    toPage(path) {
+      this.$router.push({
+        path: path,
+      });
+    },
     pickAddress() {
       this.$router.push({
         path: "/addressList",
+        query: {
+          isOrder: 1,
+        },
       });
     },
-    plus(items) {
-      let params = {
-        carId: items.id,
-        num: 1,
-      };
+    submitOrder() {
       let that = this;
-      this.$https.post(that.$api.common.carAddNum, params).then((res) => {
-        console.log(res);
-      });
-    },
-    minus(items) {
       let params = {
-        carId: items.id,
-        num: -1,
+        payType: 1,
       };
-      let that = this;
-      this.$https.post(that.$api.common.carAddNum, params).then((res) => {
+      this.$https.post(that.$api.common.createOrder, params).then((res) => {
         console.log(res);
       });
     },
@@ -244,7 +265,6 @@ export default {
     .img {
       height: 50px;
       width: 50px;
-      // background: #da251b;
     }
     .name {
       color: #2c2c2c;
@@ -295,8 +315,7 @@ export default {
     background-color: #f5f5f5;
     padding: 10px 13px;
     box-sizing: border-box;
-    width: 355px;
-    // margin: auto;
+    width: 100%;
     border: none;
     border-radius: 5px;
     resize: none;
@@ -304,7 +323,7 @@ export default {
 }
 .itemD {
   background-color: #ffffff;
-  padding: 0 13px 10px;
+  // padding: 0 13px 10px;
   box-sizing: border-box;
   .itemList {
     height: 30px;

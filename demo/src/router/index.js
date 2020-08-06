@@ -33,6 +33,9 @@ const orderDetailComponent = resolve => require(['@/views/mine/orderDetail'], re
 const cardAddComponent = resolve => require(['@/views/mine/cardAdd'], resolve) //添加银行卡
 const logisticsInformationComponent = resolve => require(['@/views/mine/logisticsInformation'], resolve) //填写物流信息
 const passwordEditComponent = resolve => require(['@/views/mine/passwordEdit'], resolve) //密码修改
+const commissionComponent = resolve => require(['@/views/mine/commission'], resolve) //佣金玩法
+const couponComponent = resolve => require(['@/views/mine/coupon'], resolve) //优惠券
+const paymentComponent = resolve => require(['@/views/mine/payment'], resolve) //付款方式
 
 
 import mine from '@/views/mine/Mmine/router'
@@ -40,7 +43,7 @@ import mine from '@/views/mine/Mmine/router'
 const router = new Router({
     routes: [
         ...mine,
-        { path: '/', redirect: '/login' },
+        { path: '/', redirect: '/home' },
         { path: '/login', component: loginCompnent },
         { path: '/register', component: registerCompnent },
         { path: '/home', component: homeComponent },
@@ -70,6 +73,9 @@ const router = new Router({
         { path: '/cardAdd', component: cardAddComponent },
         { path: '/logisticsInformation', component: logisticsInformationComponent },
         { path: '/passwordEdit', component: passwordEditComponent },
+        { path: '/commission', component: commissionComponent },
+        { path: '/coupon', component: couponComponent },
+        { path: '/payment', component: paymentComponent },
     ]
 })
 

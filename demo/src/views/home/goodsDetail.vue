@@ -15,9 +15,9 @@
       </div>
     </div>
     <hl-tab
-      style="margin-top:10px;"
+      style="margin-top:10px;margin-bottom:50px;"
       v-if="goodsDetail.goodsDetail"
-      :tab1="goodsDetail.goodsDetail.content"
+      :tabForm="goodsDetail.goodsDetail"
     />
     <hl-goodsAction :detail="goodsDetail" />
   </div>
@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     getQuery() {
-      this.dataInfo = this.$route.query.obj;
+      this.dataInfo = JSON.parse(this.$route.query.obj);
     },
     getDetail() {
       let params = {

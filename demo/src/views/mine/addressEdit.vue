@@ -65,9 +65,26 @@ export default {
     "van-popup": Popup,
   },
   created() {
+    this.getQuery();
     this.getAllArea();
   },
   methods: {
+    getQuery() {
+      this.addressData = JSON.parse(this.$route.query.address);
+      if (
+        this.addressData.provinceName &&
+        this.addressData.cityName &&
+        this.addressData.districtName
+      ) {
+        this.addressData.address =
+          this.addressData.provinceName +
+          "/" +
+          this.addressData.cityName +
+          "/" +
+          this.addressData.districtName;
+      }
+      this.addressData.isDefault = this.addressData.isDefault ? true : false;
+    },
     getAllArea() {
       let that = this;
       this.$https.get(that.$api.common.getAllArea).then((res) => {
@@ -118,10 +135,11 @@ export default {
     },
     onSave() {
       let params = {
+        id: this.addressData.id,
         userCode: this.$storage.getItem("userInfo").userCode,
         userId: this.$storage.getItem("userInfo").id,
         isDefault: this.addressData.isDefault ? "1" : "0",
-        receiver: this.addressData.name,
+        receiver: this.addressData.receiver,
         phone: this.addressData.phone,
         provinceName: this.addressData.provinceName,
         provinceCode: this.addressData.provinceCode,

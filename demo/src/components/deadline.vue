@@ -145,7 +145,7 @@ export default {
       this.$router.push({
         path: "commodityDetail",
         query: {
-          obj: val,
+          obj: JSON.stringify(val),
         },
       });
     },

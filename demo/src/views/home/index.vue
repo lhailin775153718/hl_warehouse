@@ -1,5 +1,5 @@
 <template>
-  <div :style="{'overflow': isSearch ? 'hidden' : 'scroll'}">
+  <div :style="{'overflow': isSearch ? 'hidden' : 'visible'}">
     <van-search
       v-model="selectInfo"
       placeholder="请输入搜索关键词"
@@ -87,13 +87,6 @@ export default {
     getSwiperImage() {
       let that = this;
       this.$https.get(that.$api.common.getSwiperImage).then((res) => {
-        this.imageList = res.data.data;
-      });
-    },
-    getActivity() {
-      let params = {};
-      let that = this;
-      this.$https.get("/system/Carousel/getList").then((res) => {
         this.imageList = res.data.data;
       });
     },
