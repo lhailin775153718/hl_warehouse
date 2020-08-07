@@ -57,9 +57,11 @@ export default {
           opt: [
             {
               categoryName: "从低到高",
+              checked: false,
             },
             {
               categoryName: "从高到低",
+              checked: false,
             },
           ],
         },
@@ -82,7 +84,12 @@ export default {
     getGoodsCategory() {
       let that = this;
       this.$https.get(that.$api.common.goodsCategory).then((res) => {
-        this.popup[1].opt = res.data.data;
+  
+        res.data.data.forEach((res) => {
+          res.checked = false
+        })
+        this.$set(this.popup[1], 'opt' , res.data.data)
+        // this.popup[1].opt = res.data.data;
         console.log(this.popup);
       });
     },
@@ -192,6 +199,6 @@ export default {
 }
 .active {
   background-color: #fff7f7 !important;
-  color: #e04038;
+  color: #e04038 !important;
 }
 </style>
