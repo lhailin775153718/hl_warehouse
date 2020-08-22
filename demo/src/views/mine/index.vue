@@ -6,26 +6,26 @@
         <div class="img"></div>
       </div>
       <div class="head" @click="toPage('/personal')">
-        <div class="img"></div>
+        <img class="img" v-if="userDetail.headImgUrl" :src="imageUrl + userDetail.headImgUrl" />
         <div class="itemA">
           <div class="itemB">
-            <div class="name">爱范儿</div>
+            <div class="name">{{userDetail.name}}</div>
             <div class="tags">会员</div>
           </div>
-          <div class="phone">18825060396</div>
+          <div class="phone">{{userDetail.phone}}</div>
         </div>
       </div>
       <div class="column">
-        <div class="balance" @click="toPage('/integral')">
-          <div class="num">0</div>
+        <div class="balance" @click="toPage('/accountBalance')">
+          <div class="num">{{(userDetail.accountBalance/100).toFixed(2)}}</div>
           <div class="text">账户余额(元)</div>
         </div>
-        <div class="gold" @click="toPage('/integral')">
-          <div class="num">0</div>
+        <div class="gold" @click="toPage('/gold')">
+          <div class="num">{{userDetail.gold}}</div>
           <div class="text">金币</div>
         </div>
         <div class="integral" @click="toPage('/integral')">
-          <div class="num">0</div>
+          <div class="num">{{userDetail.integral}}</div>
           <div class="text">积分</div>
         </div>
       </div>
@@ -36,18 +36,18 @@
         <span class="orderLeft">我的订单</span>
         <span class="orderRight" @click="toPage('/orderList')">查看全部订单></span>
       </div>
-      <hl-grid :grid="grid" :columnNum="columnNum" />
+      <hl-grid :grid="grid" :columnNum="columnNum" @toPage="gridPage" />
     </div>
     <van-cell-group>
-      <van-cell title="佣金玩法" @click="toPage('/commission')" is-link center icon="../../../static/image/yongjin.png" />
-      <van-cell title="我的优惠券" @click="toPage('/coupon')" is-link center icon="../../../static/image/youhuiquan.png" />
-      <van-cell title="我的收藏" @click="toPage('/collect')" is-link center icon="../../../static/image/follow-act.png" />
-      <van-cell title="银行卡管理" @click="toPage('/bankCard')" is-link center icon="../../../static/image/yinhangka.png" />
-      <van-cell title="地址管理" @click="toPage('/addressList')" is-link center icon="../../../static/image/dizhi.png" />
+      <van-cell title="佣金玩法" @click="toPage('/commission')" is-link center icon="../../assets/image/yongjin.png" />
+      <van-cell title="我的优惠券" @click="toPage('/myCoupon')" is-link center icon="../../assets/image/youhuiquan.png" />
+      <van-cell title="我的收藏" @click="toPage('/collect')" is-link center icon="../../assets/image/follow-act.png" />
+      <van-cell title="银行卡管理" @click="toPage('/bankCard')" is-link center icon="../../assets/image/yinhangka.png" />
+      <van-cell title="地址管理" @click="toPage('/addressList')" is-link center icon="../../assets/image/dizhi.png" />
     </van-cell-group>
     <van-cell-group>
-      <van-cell title="帮助中心" @click="toPage('/commission')" is-link center icon="../../../static/image/bangzhu.png" />
-      <van-cell title="关于我们" @click="toPage('/commission')" is-link center icon="../../../static/image/guanyuwomen.png" />
+      <!-- <van-cell title="帮助中心" @click="toPage('/commission')" is-link center icon="../../assets/image/bangzhu.png" /> -->
+      <van-cell title="商家端" @click="toPage('/businessOrderList')" is-link center icon="../../assets/image/guanyuwomen.png" />
     </van-cell-group>
   </div>
 </template>
@@ -58,29 +58,36 @@ import grid from "@/components/grid";
 export default {
   data() {
     return {
+      imageUrl: this.$https.imageUrl,
       grid: [
         {
           text: "待付款",
-          icon: "../../../static/image/daifukuan.png",
+          icon: require("../../assets/image/daifukuan.png"),
+          status: 0,
         },
         {
           text: "配送中",
-          icon: "../../../static/image/peisongzhong.png",
+          icon: require("../../assets/image/peisongzhong.png"),
+          status: 2,
         },
         {
           text: "已完成",
-          icon: "../../../static/image/yiwancheng.png",
+          icon: require("../../assets/image/yiwancheng.png"),
+          status: 4,
         },
         {
           text: "待评价",
-          icon: "../../../static/image/daipingjia.png",
+          icon: require("../../assets/image/daipingjia.png"),
+          status: 3,
         },
         {
           text: "退款/售后",
-          icon: "../../../static/image/tuikuan.png",
+          icon: require("../../assets/image/tuikuan.png"),
+          status: 5,
         },
       ],
       columnNum: 5,
+      userDetail: {},
     };
   },
   components: {
@@ -88,7 +95,16 @@ export default {
     "van-cell-group": CellGroup,
     "hl-grid": grid,
   },
+  created() {
+    this.getUserInfo();
+  },
   methods: {
+    getUserInfo() {
+      let params = { userCode: this.$storage.getItem('userInfo').userCode }
+      this.$https.get(this.$api.common.getUserInfo, params).then((res) => {
+        this.userDetail = res.data.data;
+      });
+    },
     goRouter(item) {
       console.log("item", item);
       this.$router.push({ name: item });
@@ -96,6 +112,13 @@ export default {
     toPage(path) {
       this.$router.push({ path: path });
     },
+    gridPage(val){
+      this.$router.push({
+        path:'/orderList',
+        query:{
+          status: val.status
+        }})
+    }
   },
 };
 </script>
@@ -118,7 +141,6 @@ export default {
       float: right;
       height: 21.5px;
       width: 21.5px;
-      background-image: url("../../../static/image/xiaoxi.png");
       background-size: 100% 100%;
       position: absolute;
       top: 0;
@@ -136,7 +158,7 @@ export default {
     .img {
       height: 55px;
       width: 55px;
-      background-image: url("../../../static/image/test.jpg");
+      background-image: url("../../assets/image/test.jpg");
       background-size: 100% 100%;
       border-radius: 10px;
     }

@@ -11,8 +11,10 @@
     <div class="itemB flex_c_sb">
       <div class="blockA img"></div>
       <div class="blockB">
-        <div>{{orderData.name}} {{orderData.phone}}</div>
-        <div class="address">地址:{{orderData.address}}</div>
+        <div>{{orderData.orderAddress.receiver}} {{orderData.orderAddress.phone}}</div>
+        <div
+          class="address"
+        >地址:{{orderData.orderAddress.provinceName + orderData.orderAddress.cityName + orderData.orderAddress.districtName + orderData.orderAddress.addressDetail}}</div>
       </div>
     </div>
 
@@ -21,20 +23,24 @@
         <div class="icon"></div>
         <div class="title">华山自营</div>
       </div>
-      <div class="commodity flex_c_sb">
-        <div class="img">img</div>
+      <div
+        class="commodity flex_c_sb"
+        v-for="(item,index) in orderData.orderDetailList"
+        :key="index"
+      >
+        <img class="img" :src="imageUrl + item.goodsImg" />
         <div class="content">
-          <div class="name">{{orderData.commodityName}}</div>
+          <div class="name">{{item.goodsName}}</div>
           <div class="price flex_c_sb">
-            <div class="oprice">{{orderData.price}}</div>
-            <div class="num">x {{orderData.nub}}</div>
+            <div class="oprice">{{(item.price/100).toFixed(2)}}</div>
+            <div class="num">x {{item.num}}</div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="itemC">
-      <div>{{orderData.beizhu}}</div>
+      <div>{{orderData.remark}}</div>
     </div>
 
     <div class="itemD">
@@ -42,16 +48,15 @@
         <div class="key">{{item.name}}</div>
         <div class="value">{{item.value}}</div>
       </div>
-      <div class="itemPrice" style="text-align: right">￥{{orderData.Allprice}}</div>
+      <div class="itemPrice" style="text-align: right">￥{{(orderData.payPrice/100).toFixed(2)}}</div>
     </div>
 
     <div class="itemE">
       <div class="fuzhi">复制</div>
-      <div
-        class="itemEList"
-        v-for="(item, index) in  orderData.itemAlist"
-        :key="index"
-      >{{item.name}} {{item.value}}</div>
+      <div class="itemEList">订单编号: {{orderData.orderNo}}</div>
+      <div class="itemEList">下单时间: {{orderData.createTime}}</div>
+      <div class="itemEList">发货时间: {{orderData.sendTime}}</div>
+      <div class="itemEList">自动签收: {{orderData.receiptTime}}</div>
     </div>
 
     <div class="footer">
@@ -66,6 +71,7 @@
 export default {
   data() {
     return {
+      imageUrl: this.$https.imageUrl,
       header: {
         title: "订单详情",
         isLeftArrow: true,
@@ -77,34 +83,14 @@ export default {
     "hl-header": () => import("@/components/header"),
   },
   created() {
-    let data = {
-      src: "",
-      commodityName:
-        "爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十",
-      specs: "5kg",
-      price: "66.00",
-      nub: 2,
-      Allprice: 123,
-      itemAlist: [
-        { name: "订单编号：", value: 123456123456 },
-        { name: "下单时间：", value: 123456123456 },
-        { name: "发货时间：", value: 123456123456 },
-        { name: "自动签收：", value: 123456123456 },
-      ],
-      itemBlist: [
-        { name: "商品总金额：", value: 123 },
-        { name: "运费：", value: 123 },
-        { name: "积分：", value: 123 },
-        { name: "优惠券：", value: 123 },
-      ],
-      name: "林小姐",
-      phone: "13247845465465",
-      address: "地址啊是吧是吧是吧是吧是吧是吧是吧是吧是吧",
-      beizhu: "地址啊是吧是吧是吧是吧是吧是吧是吧是吧是吧",
-    };
-    this.orderData = data;
+    this.getQuery();
   },
-  methods: {},
+  methods: {
+    getQuery() {
+      this.orderData = JSON.parse(this.$route.query.obj);
+      console.log(this.orderData);
+    },
+  },
 };
 </script>
 <style scoped lang="less">
@@ -152,7 +138,7 @@ export default {
   .img {
     height: 50px;
     width: 50px;
-    background-image: url("../../../../static/image/mineIcon1.png");
+    background-image: url("../../../assets/image/mineIcon1.png");
     background-size: 100% 100%;
     margin-right: 35px;
   }
@@ -175,7 +161,7 @@ export default {
   .img {
     height: 16.5px;
     width: 13px;
-    background-image: url("../../../../static/image/dizhi.png");
+    background-image: url("../../../assets/image/dizhi.png");
     background-size: 100% 100%;
     margin-right: 15.5px;
   }
@@ -191,7 +177,7 @@ export default {
     .icon {
       height: 14px;
       width: 14.5px;
-      background-image: url("../../../../static/image/carLogo1.png");
+      background-image: url("../../../assets/image/carLogo1.png");
       background-size: 100% 100%;
     }
     .title {
@@ -258,6 +244,7 @@ export default {
     width: 355px;
     margin: auto;
     border-radius: 5px;
+    min-height: 30px;
   }
 }
 .itemD {

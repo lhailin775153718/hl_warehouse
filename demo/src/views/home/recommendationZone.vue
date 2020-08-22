@@ -15,7 +15,12 @@
       v-if="isSearch"
     />
     <div style="margin-top:1px;">
-      <hl-screening :selectForm="selectForm" />
+      <hl-screening
+        :selectForm="selectForm"
+        @sure="sure"
+        @reset="reset"
+        @dropdownChange="dropdownChange"
+      />
     </div>
     <van-pull-refresh :disabled="disabled" v-model="refreshing" @refresh="onRefresh">
       <van-list
@@ -36,8 +41,8 @@
             <div class="itemRight">
               <p class="itemTitle">{{item.goodsName}}</p>
               <span class="itemNum">{{item.sales}}</span>
-              <span class="itemPirce">{{item.price}}</span>
-              <img class="itemIcon" src="../../../static/image/carLogo.png" alt />
+              <span class="itemPirce">{{(item.price/100).toFixed(2)}}</span>
+              <img class="itemIcon" src="../../assets/image/carLogo.png" alt />
             </div>
           </div>
         </div>
@@ -55,7 +60,6 @@ export default {
   data() {
     return {
       imageUrl: this.$https.imageUrl,
-      isLoading: false,
       header: {
         title: "",
         isLeftArrow: true,
@@ -64,7 +68,7 @@ export default {
       selectData: "",
       isSearch: false,
       list: [],
-      listInfo: [],
+      // listInfo: [],
       selectForm: {
         page: 1,
         pageSize: 10,
@@ -105,16 +109,13 @@ export default {
           : this.$route.query.selectInfo;
     },
     getActivityList() {
-      if (this.isLoading) {
-        return;
-      }
-
-      if (this.listInfo.length > 0) {
-        if (this.selectForm.page == this.listInfo.data.data.pages) {
-          this.finished.state = true;
-          return;
-        }
-      }
+      // console.log(this.listInfo,"listInfo")
+      // if (this.listInfo.length > 0) {
+      //   if (this.selectForm.page == this.listInfo.data.data.pages) {
+      //     this.finished.state = true;
+      //     return;
+      //   }
+      // }
 
       let params = this.selectForm;
       params.goodsName = this.selectInfo;
@@ -123,21 +124,22 @@ export default {
         .get(that.$api.common.activityGoodsList, params)
         .then((res) => {
           let array = res.data.data.records;
-          if (array.length > 0) {
-            this.list = this.$commonFn.scrollPushFn(this.list, array);
+          if (this.selectForm.page > 1) {
+            this.list.push(...array);
+          } else {
+            this.list = array;
           }
-          this.listInfo = res;
-          
+          // this.listInfo = res;
+
           if (this.selectForm.page == res.data.data.pages) {
             this.finished.state = true;
           } else {
             this.selectForm.page = this.selectForm.page++;
           }
-
-          this.isLoading = false;
         });
     },
     toDetail(val) {
+      console.log(val);
       this.$router.push({
         path: "commodityDetail",
         query: {
@@ -159,10 +161,21 @@ export default {
     },
     onRefresh() {
       if (this.refreshing) {
-        this.list = [];
         this.refreshing = false;
       }
       this.selectForm.page = 1;
+      this.getActivityList();
+    },
+    sure(val) {
+      this.selectForm = val;
+      this.getActivityList();
+    },
+    reset(val) {
+      this.selectForm = val;
+      this.getActivityList();
+    },
+    dropdownChange(val) {
+      this.selectForm = val;
       this.getActivityList();
     },
   },

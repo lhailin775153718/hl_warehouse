@@ -4,7 +4,7 @@
     <div class="help">
       <div class="helpItem" v-for="(item,index) in helpList" :key="index">
         <div class="helpTitle">
-          <img src="../../../static/image/helpLogo.png" alt />
+          <img src="../../assets/image/helpLogo.png" alt />
           <p>{{item.key}}</p>
         </div>
         <div class="helpContent">{{item.value}}</div>

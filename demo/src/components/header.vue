@@ -1,12 +1,16 @@
 <template>
-  <van-nav-bar
-    :title="header.title"
-    :left-text="header.leftText"
-    :right-text="header.rightText"
-    :left-arrow="header.isLeftArrow"
-    @click-left="onClickLeft"
-    @click-right="onClickRight"
-  />
+  <div>
+    <van-nav-bar
+      class="header"
+      :title="header.title"
+      :left-text="header.leftText"
+      :right-text="header.rightText"
+      :left-arrow="header.isLeftArrow"
+      @click-left="onClickLeft"
+      @click-right="onClickRight"
+    />
+    <van-nav-bar class="header-bg" />
+  </div>
 </template>
 
 <script>
@@ -23,7 +27,7 @@ export default {
     return {};
   },
   components: {
-    "van-nav-bar": NavBar
+    "van-nav-bar": NavBar,
   },
   methods: {
     onClickLeft() {
@@ -31,7 +35,18 @@ export default {
     },
     onClickRight() {
       this.$emit("onClickRight");
-    }
-  }
+    },
+  },
 };
 </script>
+
+<style lang="less" scoped>
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+.header-bg {
+  visibility: hidden;
+}
+</style>

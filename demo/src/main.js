@@ -2,7 +2,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 
-import '../static/css/common.css';
+import './assets/css/common.css';
 import 'amfe-flexible'
 import Https from './js/https'
 import Storage from './js/storage'
@@ -12,12 +12,13 @@ import qs from 'qs'
 
 // import Vant from 'vant';
 import 'vant/lib/index.css';
-import { Swipe, SwipeItem, Lazyload, Tab, Tabs } from "vant";
+import { Lazyload, Tab, Tabs, Toast } from "vant";
 Vue.use(Tab);
 Vue.use(Tabs);
 Vue.use(Lazyload, {
     lazyComponent: true
 });
+Vue.use(Toast);
 
 
 Vue.prototype.$https = Https;

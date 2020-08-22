@@ -21,7 +21,6 @@
 
 <script>
 import divider from "@/components/divider";
-// import Storage from "@/js/storage.js";
 import axios from "axios";
 export default {
   data() {
@@ -36,8 +35,18 @@ export default {
   components: {
     "hl-divider": divider,
   },
+  created() {
+    // let data = window.location.href;
+    let a = this.GetUrlParam('code');
+    console.log(a)
+  },
   methods: {
     getCode() {
+      if (this.phoneNumbe == "") {
+        this.$toast("请输入手机号");
+        return;
+      }
+
       const TIME_COUNT = 60;
       if (!this.timer) {
         this.count = TIME_COUNT;
@@ -61,12 +70,20 @@ export default {
         url: "http://shopkeeper.gdkeyong.com/api" + that.$api.common.getCode,
         method: "get",
         params: params,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+        }
       }).then((res) => {});
-      // this.$https.get(that.$api.common.getCode, params).then((res) => {
-      //   console.log(res);
-      // });
     },
     login() {
+      if (this.phoneNumbe == "") {
+        this.$toast("请输入手机号");
+        return;
+      }
+      if (this.code == "") {
+        this.$toast("请输验证码");
+        return;
+      }
       let params = {
         loginName: this.phoneNumber,
         checkCode: this.code,
@@ -77,23 +94,40 @@ export default {
         method: "post",
         data: params,
       }).then((res) => {
-        that.$storage.setItem("userInfo", res.data.data);
-        that.$router.push({
-          path: "/home",
-        });
+        if (res.data.success) {
+          that.$storage.setItem("userInfo", res.data.data);
+          that.$router.replace({
+            path: "/home",
+          });
+        } else {
+          that.$toast(res.data.message);
+        }
       });
-      // this.$https.post(that.$api.common.login, params).then((res) => {
-      //   that.$storage.setItem("userInfo", res.data.data);
-      //   that.$router.push({
-      //     path: "/home",
-      //   });
-      // });
     },
     register() {
       this.$router.push({
         path: "/register",
       });
     },
+    GetUrlParam(paraName) {
+      var url = document.location.toString();
+      // var url = 'http://shopkeeper-mp.gdkeyong.com/mp/dist/index.html?code=0213AyFa1JAdtz09p9Ia1Umz3t43AyFH&state=STATE#/login';
+      var arrObj = url.split("?");
+      if (arrObj.length > 1) {
+        var arrPara = arrObj[1].split("&");
+        var arr;
+        for (var i = 0; i < arrPara.length; i++) {
+          arr = arrPara[i].split("=");
+          if (arr != null && arr[0] == paraName) {
+            return arr[1];
+          }
+        }
+        return "";
+      }
+      else {
+        return "";
+      }
+    }
   },
 };
 </script>
@@ -106,7 +140,7 @@ export default {
   padding-top: 46.5px;
   box-sizing: border-box;
   .backImage {
-    background: url("../../../static/image/loginLogo.png");
+    background: url("../../assets/image/loginLogo.png");
     background-size: 100% 100%;
     height: 163.5px;
     width: 200px;

@@ -2,24 +2,22 @@
   <div>
     <div class="detailTitle">
       <img-swipe :images="imageList" :swipeData="swipeData" />
-      <div class="cancelBtn" @click="cancel"></div>
+      <div class="cancelBtn" @click="cancel">
+        <img src="../../assets/image/return-w.png" alt />
+      </div>
     </div>
     <div class="detailContent">
       <p class="goodsName">{{goodsDetail.goodsName}}</p>
       <div class="goodsProp">
-        <span class="price">{{goodsDetail.price}}</span>
+        <span class="price">{{(goodsDetail.price/100).toFixed(2)}}</span>
         <div class="goodsProp-right">
           <span class="num">已售{{goodsDetail.sales}}件</span>
-          <img src="../../../static/image/follow-act.png" alt />
+          <img :src="goodsDetail.isCollect ? '../../assets/image/follow-act.png' : '../../assets/image/follow-bg.png'" @click="collect" />
         </div>
       </div>
     </div>
-    <hl-tab
-      style="margin-top:10px;margin-bottom:50px;"
-      v-if="goodsDetail.goodsDetail"
-      :tabForm="goodsDetail.goodsDetail"
-    />
-    <hl-goodsAction :detail="goodsDetail" />
+    <hl-tab style="margin-top:10px;margin-bottom:50px;" v-if="goodsDetail.goodsDetail" :tabForm="goodsDetail.goodsDetail" />
+    <hl-goodsAction v-if="goodsDetail" :detail="goodsDetail" />
   </div>
 </template>
 
@@ -45,33 +43,53 @@ export default {
   },
   created() {
     this.getQuery();
-    this.getDetail();
   },
   methods: {
     getQuery() {
-      this.dataInfo = JSON.parse(this.$route.query.obj)
+      this.dataInfo = JSON.parse(this.$route.query.obj);
+      this.getDetail();
     },
     getDetail() {
       let params = {
         activityId: this.dataInfo.id,
       };
       let that = this;
-      this.$https
-        .get(that.$api.common.getactivityGoodsDetail, params)
-        .then((res) => {
-          let array = res.data.data.goodsMediaList;
-          for (let i = 0; i < array.length; i++) {
-            let obj = {};
-            obj.imgUrl = array[i].fileUrl;
-            this.imageList.push(obj);
-          }
-          res.data.data.goodsSpecVOS.forEach((res) => {
-            res.specProperties.forEach((resB) => {
-              resB.select = false;
-            });
+      this.$https.get(that.$api.common.getactivityGoodsDetail, params).then((res) => {
+        let array = res.data.data.goodsMediaList;
+        for (let i = 0; i < array.length; i++) {
+          let obj = {};
+          obj.imgUrl = array[i].fileUrl;
+          this.imageList.push(obj);
+        }
+        res.data.data.goodsSpecVOS.forEach((res) => {
+          res.specProperties.forEach((resB) => {
+            resB.select = false;
           });
-          this.goodsDetail = res.data.data;
         });
+        this.goodsDetail = res.data.data;
+      });
+    },
+    collect() {
+      // let params = {
+      //   page: 1,
+      //   pageSize: 10,
+      //   userCode: this.$storage.getItem("userInfo").userCode,
+      // };
+      // this.$https.get(this.$api.common.getCollectList, params).then((res) => {
+      //   console.log(res);
+      // });
+      // return
+
+      let url = this.goodsDetail.isCollect ? this.$api.common.cancelCollect : this.$api.common.addCollect;
+      this.goodsDetail.isCollect = !this.goodsDetail.isCollect;
+      let params = {
+        goodsCode: this.goodsDetail.goodsCode,
+        userCode: this.$storage.getItem("userInfo").userCode,
+      };
+      let that = this;
+      this.$https.get(url, params).then((res) => {
+        console.log(res);
+      });
     },
     cancel() {
       this.$router.go(-1);
@@ -84,13 +102,24 @@ export default {
 .detailTitle {
   position: relative;
   .cancelBtn {
-    position: absolute;
+    position: fixed;
     left: 12.5px;
     top: 12.5px;
     height: 26px;
     width: 26px;
     border-radius: 13px;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: #797b7d;
+    img {
+      height: 14px;
+      width: 8.5px;
+      background-size: 100% 100%;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      margin: auto;
+    }
   }
 }
 .detailContent {

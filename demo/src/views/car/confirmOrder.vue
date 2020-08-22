@@ -12,12 +12,16 @@
       <div class="blockA img2"></div>
     </div>
 
-    <div class="commodityContainer" v-for="(item,index) in orderData" :key="index">
+    <div
+      class="commodityContainer"
+      v-for="(item,index) in orderData.settlementShopGoodsList"
+      :key="index"
+    >
       <div class="commodityTop">
         <div class="icon"></div>
         <div class="title">{{item.shopName}}</div>
       </div>
-      <div class="commodity flex_c_sb" v-for="items in item.shoppingCarGoodsList" :key="items.id">
+      <div class="commodity flex_c_sb" v-for="items in item.settlementGoodsList" :key="items.id">
         <div style="width:100%;">
           <div class="flex_c_sb">
             <img class="img" :src="imageUrl + items.goodsImage" />
@@ -29,17 +33,17 @@
               </div>
             </div>
           </div>
-          <div class="itemC">
-            <textarea placeholder="给卖家留言..."></textarea>
-          </div>
 
           <div class="itemD">
             <div class="itemPrice" style="text-align: right">
               <span>共{{items.number}}件商品,合计</span>
-              ￥{{items.price}}
+              ￥{{(items.price/100).toFixed(2)}}
             </div>
           </div>
         </div>
+      </div>
+      <div class="itemC">
+        <textarea v-model="item.remark" placeholder="给卖家留言..."></textarea>
       </div>
     </div>
 
@@ -69,7 +73,7 @@
     </van-cell-group>
 
     <van-cell-group style="margin-top:10px;margin-bottom:70px;">
-      <van-cell title="商品金额" :value="'￥' + price" center />
+      <van-cell title="商品金额" :value="'￥' + (price/100).toFixed(2)" center />
       <!-- <van-cell title="+运费" value="7" center></van-cell> -->
       <van-cell title="-优惠券折扣" :value="count" center />
     </van-cell-group>
@@ -78,16 +82,14 @@
       <span class="span1">共{{count}}件,</span>
       <span class="span2">合计:</span>
       <span class="span3">￥</span>
-      <span class="price">{{price-count}}</span>
+      <span class="price">{{(price/100-count).toFixed(2)}}</span>
       <div class="submitOrder" @click="submitOrder">提交订单</div>
     </div>
   </div>
 </template>
 
-
 <script>
 import { Stepper, Cell, CellGroup, Switch } from "vant";
-import Bus from "@/js/bus.js";
 export default {
   data() {
     return {
@@ -96,6 +98,7 @@ export default {
         title: "确认订单",
         isLeftArrow: true,
       },
+      userInfo: this.$storage.getItem("userInfo"),
       orderData: {},
       address: {},
       count: 0,
@@ -124,19 +127,11 @@ export default {
   methods: {
     getQuery() {
       this.orderData = JSON.parse(this.$route.query.order);
-      let temp = [];
-      this.orderData.forEach((item) => {
-        item.shoppingCarGoodsList.forEach((res) => {
-          if (res.checked) {
-            temp.push(item);
-          }
-        });
-      });
-      this.orderData = temp;
+      console.log(this.orderData);
     },
     initialize() {
-      this.orderData.forEach((res) => {
-        res.shoppingCarGoodsList.forEach((res1) => {
+      this.orderData.settlementShopGoodsList.forEach((res) => {
+        res.settlementGoodsList.forEach((res1) => {
           this.price += res1.price;
           this.count += res1.number;
         });
@@ -171,11 +166,14 @@ export default {
     },
     submitOrder() {
       let that = this;
-      let params = {
-        payType: 1,
-      };
+      let params = this.orderData;
+      params.payType = 1;
+      params.address = this.address;
       this.$https.post(that.$api.common.createOrder, params).then((res) => {
-        console.log(res);
+        this.$toast.success("支付成功");
+        setTimeout(() => {
+          that.$router.replace("/orderList");
+        }, 2000);
       });
     },
   },
@@ -205,7 +203,7 @@ export default {
   .img {
     height: 50px;
     width: 50px;
-    background-image: url("../../../static/image/mineIcon1.png");
+    background-image: url("../../assets/image/mineIcon1.png");
     background-size: 100% 100%;
     margin-right: 35px;
   }
@@ -228,14 +226,14 @@ export default {
   .img {
     height: 16.5px;
     width: 13px;
-    background-image: url("../../../static/image/address.png");
+    background-image: url("../../assets/image/address.png");
     background-size: 100% 100%;
     margin-right: 15.5px;
   }
   .img2 {
     height: 14.5px;
     width: 8.5px;
-    background-image: url("../../../static/image/turn2.png");
+    background-image: url("../../assets/image/turn2.png");
     background-size: 100% 100%;
     margin-right: 10px;
   }
@@ -251,7 +249,7 @@ export default {
     .icon {
       height: 14px;
       width: 14.5px;
-      background-image: url("../../../static/image/carLogo1.png");
+      background-image: url("../../assets/image/carLogo1.png");
       background-size: 100% 100%;
     }
     .title {

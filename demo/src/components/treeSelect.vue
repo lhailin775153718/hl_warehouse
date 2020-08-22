@@ -13,7 +13,7 @@
           :key="index"
           @click="toGoodsCategoryList(items)"
         >
-          <img class="itemImg" :src="items.src" alt />
+          <img class="itemImg" v-if="items.imgUrl" :src="imageUrl + items.imgUrl" alt />
           <p class="itemName">{{items.categoryName}}</p>
         </div>
       </div>
@@ -27,6 +27,7 @@ export default {
   props: [],
   data() {
     return {
+      imageUrl: this.$https.imageUrl,
       sidebarHeight: 0,
       active: 0,
       sidebarTitle: [],

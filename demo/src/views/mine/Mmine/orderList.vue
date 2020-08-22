@@ -1,32 +1,33 @@
 <template>
   <div style="height: 100%">
     <hl-header :header="header"></hl-header>
-    <van-tabs v-model="active">
-      <van-tab class="test123456" v-for="(item, index) in tabList" :key="index" :title="item.name">
+    <van-tabs v-model="active" @click="statusEdit">
+      <van-tab class="test123456" v-for="(item, tabIndex) in tabList" :key="tabIndex" :title="item">
         <div class="itemA" :style="{height: height + 'px'}">
           <div
             class="itemsList"
             v-for="(item, index) in itemsList"
             :key="index"
             @click="toPage(item)"
+            v-if="item.status == tabIndex"
           >
             <div class="blockA flex_c_sb">
-              <div class="orderId">{{item.orderId}}</div>
-              <div class="orderState">{{item.state}}</div>
+              <div class="orderId">{{item.orderNo}}</div>
+              <div class="orderState">{{tabList[item.status]}}</div>
             </div>
-            <div class="commodity flex_c_sb">
-              <div class="img">img</div>
+            <div class="commodity flex_c_sb" v-for="items in item.orderDetailList" :key="items.id">
+              <img class="img" :src="imageUrl + items.goodsImg" />
               <div class="content">
-                <div class="name">{{item.commodityName}}</div>
-                <div class="specs">{{item.specs}}</div>
+                <div class="name">{{items.goodsName}}</div>
+                <div class="specs">{{items.goodsSpec}}</div>
                 <div class="price flex_c_sb">
-                  <div class="contentPrice">{{item.price}}</div>
-                  <div class="contentNumber">x {{item.nub}}</div>
+                  <div class="contentPrice">{{(items.price/100).toFixed(2)}}</div>
+                  <div class="contentNumber">x {{items.num}}</div>
                 </div>
               </div>
             </div>
             <div class="blockC flex_c_sb">
-              <div class="Allprice">{{item.Allprice}}</div>
+              <div class="Allprice">{{(item.price/100).toFixed(2)}}</div>
               <div class="btn">产看物流</div>
             </div>
           </div>
@@ -41,102 +42,75 @@
 export default {
   data() {
     return {
+      imageUrl: this.$https.imageUrl,
       header: {
         title: "我的订单",
         isLeftArrow: true,
       },
       active: 0,
-      tabList: [
-        { name: "全部" },
-        { name: "待付款" },
-        { name: "待发货" },
-        { name: "待收货" },
-        { name: "已完成" },
-      ],
+      tabList: ["待付款", "待发货", "待收货", "待评价", "已完成", "退款/售后"],
       itemsList: [],
       height: document.body.clientHeight - 90,
+      selectForm: {
+        page: 1,
+        pageSize: 10,
+        shopCode: "",
+        orderNo: "",
+        userCode: this.$storage.getItem("userInfo").userCode,
+        startTime: "",
+        endTime: "",
+        status: 0,
+      },
     };
   },
   components: {
     "hl-header": () => import("@/components/header"),
   },
   created() {
-    let data = [
-      {
-        orderId: "777777",
-        state: "已完成",
-        src: "",
-        commodityName:
-          "爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十",
-        specs: "5kg",
-        price: "66.00",
-        nub: 2,
-        Allprice: 123,
-      },
-      {
-        orderId: "777777",
-        state: "已完成",
-        src: "",
-        commodityName:
-          "爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十",
-        specs: "5kg",
-        price: "66.00",
-        nub: 2,
-        Allprice: 123,
-      },
-      {
-        orderId: "777777",
-        state: "已完成",
-        src: "",
-        commodityName:
-          "爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十",
-        specs: "5kg",
-        price: "66.00",
-        nub: 2,
-        Allprice: 123,
-      },
-      {
-        orderId: "777777",
-        state: "已完成",
-        src: "",
-        commodityName:
-          "爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十",
-        specs: "5kg",
-        price: "66.00",
-        nub: 2,
-        Allprice: 123,
-      },
-      {
-        orderId: "777777",
-        state: "已完成",
-        src: "",
-        commodityName:
-          "爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十",
-        specs: "5kg",
-        price: "66.00",
-        nub: 2,
-        Allprice: 123,
-      },
-      {
-        orderId: "777777",
-        state: "已完成",
-        src: "",
-        commodityName:
-          "爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十爱上爸爸撒八十",
-        specs: "5kg",
-        price: "66.00",
-        nub: 2,
-        Allprice: 123,
-      },
-    ];
-    this.itemsList = data;
+    this.getQuery();
   },
   methods: {
+    getQuery(){
+      let status = this.$route.query.status
+      if(status != undefined){
+        this.active = status;
+        this.selectForm.status = status;
+      }
+      this.getOrderList();
+    },
+    getOrderList() {
+      let that = this;
+      this.$https
+        .get(that.$api.common.getOrderList, that.selectForm)
+        .then((res) => {
+          let array = res.data.data.records;
+          this.itemsList.push(...array);
+        });
+    },
+    statusEdit(index) {
+      this.selectForm.status = index;
+      this.itemsList = [];
+      this.getOrderList();
+    },
     toPage(val) {
+      let path;
+      switch (val.status) {
+        case 0:
+          path = "/orderDetails";
+          break;
+        case 1:
+          path = "/orderDetails1";
+          break;
+        case 3:
+          path = "/orderDetails3";
+          break;
+        default:
+          return;
+      }
       this.$router.push({
-        path: "/orderDetails",
+        path: path,
         query: {
-          obj: val,
+          obj: JSON.stringify(val),
         },
       });
     },
@@ -175,6 +149,7 @@ export default {
   }
 }
 .commodity {
+  margin-bottom: 10px;
   .img {
     height: 90px;
     width: 90px;

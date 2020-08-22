@@ -19,9 +19,9 @@
           <p>{{item.goodsName}}</p>
           <span class="contentPrice">
             <span class="Currency">￥</span>
-            {{item.price}}
+            {{(item.price/100).toFixed(2)}}
           </span>
-          <img class="contentImage" src="../../static/image/carLogo.png" />
+          <img class="contentImage" src="../assets/image/carLogo.png" />
         </div>
       </div>
     </div>
@@ -36,7 +36,6 @@ export default {
     return {
       imageUrl: this.$https.imageUrl,
       recommend: [],
-      listInfo: [],
       selectInfo: {
         page: 1,
         pageSize: 10,

@@ -40,42 +40,52 @@
       </div>
     </div>
 
-    <div class="commodity">
-      <div
-        class="commodity-item"
-        :class="{'commodityFirst':index == 0}"
-        v-for="(item,index) in commodity"
-        :key="index"
+    <van-pull-refresh :disabled="disabled" v-model="refreshing" @refresh="onRefresh">
+      <van-list
+        v-model="loading"
+        :finished="finished.state"
+        :finished-text="finished.text"
+        @load="changeDeadline('10:00:00')"
       >
-        <img class="commodity-item-image" :src="imageUrl + item.image" />
-        <div class="commodity-item-content">
-          <p class="contentName">{{item.goodsName}}</p>
-          <span class="contentNum">{{item.sales + '人购买'}}</span>
-          <span class="contentPrice">
-            <span class="Currency">￥</span>
-            {{item.price}}
-          </span>
-          <div class="contentBtn" @click="toDetail(item)">
-            <p class="contentBtn-text">去抢购</p>
-            <div class="contentBtn-progress">
-              <van-progress
-                color="#FFFFFF"
-                :percentage="item.ratio"
-                :show-pivot="false"
-                track-color="#FF948D"
-              />
-              <span class="contentBtn-progressNum">{{item.ratio}}%</span>
+        <div class="commodity">
+          <div
+            class="commodity-item"
+            :class="{'commodityFirst':index == 0}"
+            v-for="(item,index) in commodity"
+            :key="index"
+          >
+            <img class="commodity-item-image" :src="imageUrl + item.image" />
+            <div class="commodity-item-content">
+              <p class="contentName">{{item.goodsName}}</p>
+              <span class="contentNum">{{item.sales + '人购买'}}</span>
+              <span class="contentPrice">
+                <span class="Currency">￥</span>
+                {{(item.price/100).toFixed(2)}}
+              </span>
+              <div class="contentBtn" @click="toDetail(item)">
+                <p class="contentBtn-text">去抢购</p>
+                <div class="contentBtn-progress">
+                  <van-progress
+                    color="#FFFFFF"
+                    :percentage="item.ratio"
+                    :show-pivot="false"
+                    track-color="#FF948D"
+                  />
+                  <span class="contentBtn-progressNum">{{item.ratio}}%</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </van-list>
+    </van-pull-refresh>
   </div>
 </template>
 
 <script>
 import { Progress } from "vant";
 import header from "@/components/header";
+import { Search, PullRefresh, List } from "vant";
 export default {
   data() {
     return {
@@ -88,18 +98,27 @@ export default {
       commodity: [],
       selectInfo: {
         page: 1,
-        pageSize: 20,
+        pageSize: 10,
         startTime: "",
         activityType: 4,
       },
+      disabled: false,
+      finished: {
+        state: false,
+        text: "没有更多了",
+      },
+      loading: false,
+      refreshing: false,
     };
   },
   components: {
     "hl-header": header,
     "van-progress": Progress,
+    "van-pull-refresh": PullRefresh,
+    "van-list": List,
   },
   created() {
-    this.changeDeadline("10:00:00");
+    // this.changeDeadline("10:00:00");
   },
   methods: {
     getDeadline() {
@@ -108,27 +127,36 @@ export default {
       this.$https
         .get(that.$api.common.activityGoodsList, params)
         .then((res) => {
-          this.commodity = res.data.data.records;
-          for (let i = 0; i < this.commodity.length; i++) {
-            this.commodity[i].ratio = parseInt(
-              (this.commodity[i].sales / this.commodity[i].stock) * 100
-            );
-            this.commodity[i].ratio =
-              this.commodity[i].ratio > 100 ? 100 : this.commodity[i].ratio;
+          let array = res.data.data.records;
+          for (let i = 0; i < array.length; i++) {
+            array[i].ratio = parseInt((array[i].sales / array[i].stock) * 100);
+            array[i].ratio = array[i].ratio > 100 ? 100 : array[i].ratio;
+          }
+          if (this.selectInfo.page > 1) {
+            this.commodity.push(...array);
+          } else {
+            this.commodity = array;
+          }
+
+          if (this.selectInfo.page == res.data.data.pages) {
+            this.finished.state = true;
+          } else {
+            this.selectInfo.page = this.selectInfo.page++;
           }
         });
     },
     changeDeadline(val) {
       let date = new Date();
-      let startTime =
-        date.getFullYear() +
-        "-" +
-        (date.getMonth() + 1) +
-        "-" +
-        date.getDate() +
-        " " +
-        val;
+      let startTime = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " + val;
       this.selectInfo.startTime = startTime;
+      this.selectInfo.page = 1;
+      this.getDeadline();
+    },
+    onRefresh() {
+      if (this.refreshing) {
+        this.refreshing = false;
+      }
+      this.selectInfo.page = 1;
       this.getDeadline();
     },
     toDetail(val) {
@@ -136,7 +164,7 @@ export default {
         path: "commodityDetail",
         query: {
           isActivity: true,
-          obj: val,
+          obj: JSON.stringify(val),
         },
       });
     },
@@ -169,7 +197,7 @@ export default {
       font-size: 12px;
     }
     .time-item-bottom-active {
-      background: url("../../../static/image/block3.png");
+      background: url("../../assets/image/block3.png");
       background-size: 100% 100%;
       color: #ffffff;
     }
@@ -235,7 +263,7 @@ export default {
         bottom: 0.5px;
         height: 40.5px;
         width: 80.5px;
-        background-image: url("../../../static/image/block1.png");
+        background-image: url("../../assets/image/block1.png");
         background-size: 100% 100%;
         p {
           color: #ffffff;

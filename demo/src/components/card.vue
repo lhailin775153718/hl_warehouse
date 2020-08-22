@@ -8,29 +8,30 @@
         :key="index"
       >
         <div class="carListTitle">
-          <img src="../../static/image/carLogo1.png" alt />
+          <img src="../assets/image/carLogo1.png" alt />
           <span>{{item.shopName}}</span>
         </div>
         <div
           class="carListContainer"
           v-for="(items,indexs) in item.shoppingCarGoodsList"
           :key="indexs"
+          @click="toDetail(items)"
         >
           <img
             class="checkBox"
-            :src="items.checked ? '../../static/image/check.png' : '../../static/image/check-bg.png'"
+            :src="items.checked ? '../assets/image/check.png' : '../assets/image/check-bg.png'"
             alt
-            @click="checkItem(items)"
+            @click.stop="checkItem(items)"
           />
           <img class="carListContainer-image" :src="imageUrl + items.goodsImage" alt />
           <p class="carListContainer-title">{{items.goodsName}}</p>
           <div class="carListContainer-tag">
             <span>{{items.specName}}</span>
-            <img src="../../static/image/carLogo2.png" alt />
+            <img src="../assets/image/carLogo2.png" alt />
           </div>
           <span class="carListContainer-price">
             <span class="Currency">￥</span>
-            {{items.unitPrice * items.number}}
+            {{(items.unitPrice/100 * items.number).toFixed(2)}}
           </span>
           <div class="carListContainer-num">
             <van-stepper
@@ -51,14 +52,14 @@
     <div class="total">
       <img
         class="total-checkBox"
-        :src="checked ? '../../static/image/check.png' : '../../static/image/check-bg.png'"
+        :src="checked ? '../assets/image/check.png' : '../assets/image/check-bg.png'"
         alt
         @click="checkTotal()"
       />
       <span class="total-checkBoxText">全选</span>
       <span class="total-price">
         <span class="total-Currency">￥</span>
-        {{price}}
+        {{(price/100).toFixed(2)}}
       </span>
       <div class="total-btn" @click="submit">去结算</div>
     </div>
@@ -133,55 +134,66 @@ export default {
       });
     },
     plus(items) {
+      event.stopPropagation();
       let params = {
         carId: items.id,
         num: 1,
       };
       let that = this;
-      this.$https.post(that.$api.common.carAddNum, params).then((res) => {
-        console.log(res);
-      });
+      this.$https.post(that.$api.common.carAddNum, params);
     },
     minus(items) {
+      event.stopPropagation();
       let params = {
         carId: items.id,
         num: -1,
       };
       let that = this;
-      this.$https.post(that.$api.common.carAddNum, params).then((res) => {
-        console.log(res);
-      });
+      this.$https.post(that.$api.common.carAddNum, params);
     },
     submit() {
-      this.$router.push({
-        path: "confirmOrder",
-        query: {
-          order: JSON.stringify(this.list),
-        },
-      });
-      return;
-      let arr = [];
-      this.list.forEach((item) => {
-        item.shoppingCarGoodsList.forEach((res) => {
-          if (res.checked) {
-            arr.push(res.id);
+      let shoppingCarIds = [];
+      let array = [];
+      let temp = JSON.parse(JSON.stringify(this.list));
+      temp.forEach((res) => {
+        let arr = [];
+        res.shoppingCarGoodsList.forEach((res1) => {
+          if (res1.checked) {
+            arr.push(res1);
+            shoppingCarIds.push(res1.id);
           }
         });
+        res.shoppingCarGoodsList = arr;
+        if (arr != "") {
+          array.push(res);
+        }
       });
       let params = {
-        shoppingCarIds: arr,
-        userCode: Storage.getItem("userInfo").userCode,
+        shoppingCarIds: shoppingCarIds,
+        userCode: this.$storage.getItem("userInfo").userCode,
       };
       let that = this;
       this.$https.post(that.$api.common.settlement, params).then((res) => {
         console.log(res);
         this.$router.push({
           path: "confirmOrder",
+          query: {
+            order: JSON.stringify(res.data.data),
+          },
         });
       });
     },
     getList() {
       return this.list;
+    },
+    toDetail(item) {
+      console.log(item);
+      this.$router.push({
+        path: "/goodsDetail",
+        query: {
+          obj: JSON.stringify(item),
+        },
+      });
     },
   },
 };
@@ -330,7 +342,7 @@ export default {
     height: 35.5px;
     line-height: 35.5px;
     width: 90.5px;
-    background-image: url("../../static/image/block3.png");
+    background-image: url("../assets/image/block3.png");
     background-size: 100% 100%;
     position: absolute;
     top: 0;

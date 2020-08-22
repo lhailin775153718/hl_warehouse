@@ -5,6 +5,7 @@
       :key="index"
       :to="item.path"
       icon="home-o"
+      replace 
     >{{item.value}}</van-tabbar-item>
   </van-tabbar>
 </template>

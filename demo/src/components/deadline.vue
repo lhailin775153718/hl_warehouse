@@ -1,9 +1,9 @@
 <template>
   <div class="deadine">
     <div class="title">
-      <img class="imgBlock" src="../../static/image/block2.png" />
+      <img class="imgBlock" src="../assets/image/block2.png" />
       <span class="title-left">限时秒杀</span>
-      <img class="imgTurn" src="../../static/image/turn.png" />
+      <img class="imgTurn" src="../assets/image/turn.png" />
       <span class="title-right" @click="toPage">查看全部</span>
     </div>
 
@@ -58,7 +58,7 @@
           <span class="contentNum">{{item.sales + '人购买'}}</span>
           <span class="contentPrice">
             <span class="Currency">￥</span>
-            {{item.price}}
+            {{(item.price/100).toFixed(2)}}
           </span>
           <div class="contentBtn" @click="toDetail(item)">
             <p class="contentBtn-text">去抢购</p>
@@ -211,7 +211,7 @@ export default {
         font-size: 12px;
       }
       .time-item-bottom-active {
-        background: url("../../static/image/block3.png");
+        background: url("../assets/image/block3.png");
         background-size: 100% 100%;
         color: #ffffff;
       }
@@ -272,7 +272,7 @@ export default {
           bottom: 0.5px;
           height: 40.5px;
           width: 80.5px;
-          background-image: url("../../static/image/block1.png");
+          background-image: url("../assets/image/block1.png");
           background-size: 100% 100%;
           p {
             color: #ffffff;

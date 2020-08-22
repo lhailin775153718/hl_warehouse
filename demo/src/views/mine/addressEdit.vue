@@ -151,7 +151,7 @@ export default {
       };
       let that = this;
       this.$https.post(that.$api.common.addOrUpdate, params).then((res) => {
-        console.log(res);
+        this.$router.go(-1);
       });
     },
   },

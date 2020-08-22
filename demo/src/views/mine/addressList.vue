@@ -28,7 +28,6 @@
 <script>
 import { NavBar } from "vant";
 import header from "@/components/header";
-import Bus from "@/js/bus.js";
 export default {
   data() {
     return {
@@ -124,7 +123,7 @@ export default {
     }
   }
   .itemRight {
-    background-image: url("../../../static/image/addressEdit.png");
+    background-image: url("../../assets/image/addressEdit.png");
     background-size: 100% 100%;
     height: 20.5px;
     width: 20.5px;

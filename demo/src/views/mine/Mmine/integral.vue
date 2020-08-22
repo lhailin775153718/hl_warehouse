@@ -3,7 +3,7 @@
     <hl-header :header="header"></hl-header>
     <div class="itemA">
       <div>
-        <span class="integralNum">285</span>
+        <span class="integralNum">{{userInfo.integral}}</span>
         <span class="Company">分</span>
       </div>
     </div>
@@ -14,11 +14,11 @@
     <div class="itemC">
       <div class="itemsList" v-for="(item, index) in itemsList" :key="index">
         <div class="blockA">
-          <div class="nameC">{{item.name}}</div>
-          <div class="timeC">{{item.date}}</div>
+          <div class="nameC">{{item.remark}}</div>
+          <div class="timeC">{{item.createTime}}</div>
         </div>
         <div class="blockB">
-          <div class="integralC">{{item.integral}}</div>
+          <div class="integralC">{{item.type == 1 ? '-' : '+'}}{{item.amount}}</div>
         </div>
       </div>
     </div>
@@ -35,21 +35,32 @@ export default {
         isLeftArrow: true,
       },
       itemsList: [],
+      userInfo: this.$storage.getItem("userInfo"),
+      selectForm: {
+        page: 1,
+        pageSize: 10,
+        userCode: this.$storage.getItem("userInfo").userCode,
+        accountType: 3,
+      },
     };
   },
   components: {
     "hl-header": () => import("@/components/header"),
   },
   created() {
-    let data = [
-      { name: "购物", integral: "+50", date: "2020/02/12" },
-      { name: "分享", integral: "+40", date: "2020/02/12" },
-      { name: "购物", integral: "+40", date: "2020/02/12" },
-      { name: "消费", integral: "-40", date: "2020/02/12" },
-    ];
-    this.itemsList = data;
+    this.getAccountLog();
   },
-  methods: {},
+  methods: {
+    getAccountLog() {
+      let params = this.selectForm;
+      let that = this;
+      this.$https.get(that.$api.common.getAccountLog, params).then((res) => {
+        console.log(res);
+        let array = res.data.data.records;
+        this.itemsList.push(...array);
+      });
+    },
+  },
 };
 </script>
 <style scoped lang="less">

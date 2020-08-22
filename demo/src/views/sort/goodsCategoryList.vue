@@ -19,7 +19,7 @@
           <p class="itemTitle">{{item.goodsName}}</p>
           <span class="itemNum">{{item.sales}}</span>
           <span class="itemPirce">{{item.price}}</span>
-          <img class="itemIcon" src="../../../static/image/carLogo.png" alt />
+          <img class="itemIcon" src="../../assets/image/carLogo.png" alt />
         </div>
       </div>
     </div>

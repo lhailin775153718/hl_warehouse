@@ -31,11 +31,19 @@ const viewLogisticsComponent = resolve => require(['@/views/mine/viewLogistics']
 const addressListComponent = resolve => require(['@/views/mine/addressList'], resolve) //收货地址
 const orderDetailComponent = resolve => require(['@/views/mine/orderDetail'], resolve) //订单详情
 const cardAddComponent = resolve => require(['@/views/mine/cardAdd'], resolve) //添加银行卡
+const collectComponent = resolve => require(['@/views/mine/collect'], resolve) //我的收藏
 const logisticsInformationComponent = resolve => require(['@/views/mine/logisticsInformation'], resolve) //填写物流信息
 const passwordEditComponent = resolve => require(['@/views/mine/passwordEdit'], resolve) //密码修改
 const commissionComponent = resolve => require(['@/views/mine/commission'], resolve) //佣金玩法
-const couponComponent = resolve => require(['@/views/mine/coupon'], resolve) //优惠券
+const commissionListComponent = resolve => require(['@/views/mine/commissionList'], resolve) //佣金玩法
+const myCouponComponent = resolve => require(['@/views/mine/myCoupon'], resolve) //我的优惠券
+const bankCardComponent = resolve => require(['@/views/mine/bankCard'], resolve) //我的银行卡
+const shopCouponComponent = resolve => require(['@/views/mine/shopCoupon'], resolve) //小店领取优惠券
 const paymentComponent = resolve => require(['@/views/mine/payment'], resolve) //付款方式
+
+//business
+// const businessComponent = resolve => require(['@/views/mine/business/business'], resolve) //商家端主页
+const businessOrderListComponent = resolve => require(['@/views/mine/business/businessOrderList'], resolve) //商家端主页
 
 
 import mine from '@/views/mine/Mmine/router'
@@ -43,7 +51,7 @@ import mine from '@/views/mine/Mmine/router'
 const router = new Router({
     routes: [
         ...mine,
-        { path: '/', redirect: '/home' },
+        { path: '/', redirect: '/login' },
         { path: '/login', component: loginCompnent },
         { path: '/register', component: registerCompnent },
         { path: '/home', component: homeComponent },
@@ -71,11 +79,18 @@ const router = new Router({
         { path: '/addressList', component: addressListComponent },
         { path: '/orderDetail', component: orderDetailComponent },
         { path: '/cardAdd', component: cardAddComponent },
+        { path: '/collect', component: collectComponent },
         { path: '/logisticsInformation', component: logisticsInformationComponent },
         { path: '/passwordEdit', component: passwordEditComponent },
         { path: '/commission', component: commissionComponent },
-        { path: '/coupon', component: couponComponent },
+        { path: '/commissionList', component: commissionListComponent },
+        { path: '/myCoupon', component: myCouponComponent },
+        { path: '/bankCard', component: bankCardComponent },
+        { path: '/shopCoupon', component: shopCouponComponent },
         { path: '/payment', component: paymentComponent },
+
+        // { path: '/business', component: businessComponent },
+        { path: '/businessOrderList', component: businessOrderListComponent },
     ]
 })
 

@@ -1,7 +1,7 @@
 <template>
   <main style="position:relative">
     <van-dropdown-menu>
-      <van-dropdown-item v-model="value1" :options="option1" />
+      <van-dropdown-item v-model="value1" :options="option1" @change="dropdownChange" />
       <!-- <van-dropdown-item v-model="value2" :options="option2" /> -->
     </van-dropdown-menu>
     <div class="screen" style="right:33.33%;">
@@ -9,7 +9,7 @@
     </div>
     <div class="screen" @click="showPopup">
       <span class="screenText">筛选</span>
-      <img class="screenIcon" src="../../static/image/carLogo1.png" alt />
+      <img class="screenIcon" src="../assets/image/carLogo1.png" alt />
     </div>
     <van-popup v-model="show" position="right">
       <p class="popupTitle">筛选</p>
@@ -24,8 +24,8 @@
           >{{items.categoryName}}</div>
         </div>
       </div>
-      <div class="reset">重置</div>
-      <div class="sure">确定</div>
+      <div class="reset" @click="reset">重置</div>
+      <div class="sure" @click="sure">确定</div>
     </van-popup>
   </main>
 </template>
@@ -36,20 +36,18 @@ export default {
   props: ["selectForm"],
   data() {
     return {
-      value1: 0,
+      value1: "",
       value2: "a",
-      value3: "a",
       option1: [
-        { text: "销量", value: 0 },
-        { text: "最低销量", value: 1 },
-        { text: "最高销量", value: 2 },
+        { text: "销量", value: "" },
+        { text: "最低销量", value: "aes" },
+        { text: "最高销量", value: "desc" },
       ],
       option2: [
         { text: "价格", value: "a" },
         { text: "最低价格", value: "b" },
         { text: "最高价格", value: "c" },
       ],
-      option3: [{ text: "筛选", value: "a" }],
       show: false,
       popup: [
         {
@@ -58,10 +56,12 @@ export default {
             {
               categoryName: "从低到高",
               checked: false,
+              orderBy: "aes",
             },
             {
               categoryName: "从高到低",
               checked: false,
+              orderBy: "desc",
             },
           ],
         },
@@ -70,6 +70,7 @@ export default {
           opt: [],
         },
       ],
+      screenData: {},
     };
   },
   components: {
@@ -78,18 +79,17 @@ export default {
     "van-popup": Popup,
   },
   created() {
+    this.screenData = this.selectForm;
     this.getGoodsCategory();
   },
   methods: {
     getGoodsCategory() {
       let that = this;
       this.$https.get(that.$api.common.goodsCategory).then((res) => {
-  
         res.data.data.forEach((res) => {
-          res.checked = false
-        })
-        this.$set(this.popup[1], 'opt' , res.data.data)
-        // this.popup[1].opt = res.data.data;
+          res.checked = false;
+        });
+        this.$set(this.popup[1], "opt", res.data.data);
         console.log(this.popup);
       });
     },
@@ -101,6 +101,37 @@ export default {
     },
     showPopup() {
       this.show = true;
+    },
+    sure() {
+      this.show = false;
+      this.popup.forEach((res, index) => {
+        res.opt.forEach((res1) => {
+          if (res1.checked && index == 0) {
+            this.screenData.sort = "active_price";
+            this.screenData.orderBy = res1.orderBy;
+          } else if (res1.checked && index == 1) {
+            this.screenData.categoryFirstCode = res1.id;
+          }
+        });
+      });
+      this.$emit("sure", this.screenData);
+    },
+    reset() {
+      this.show = false;
+      this.popup.forEach((res1) => {
+        res1.opt.forEach((res) => {
+          res.checked = false;
+        });
+      });
+      this.value1 = "";
+      this.screenData = this.selectForm;
+      this.$emit("reset", this.screenData);
+    },
+    dropdownChange(val) {
+      if (val) {
+        this.screenData.orderBy = val;
+      }
+      this.$emit("dropdownChange", this.screenData);
     },
   },
 };

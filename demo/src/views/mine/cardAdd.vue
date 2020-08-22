@@ -2,8 +2,9 @@
   <div>
     <hl-header :header="header"></hl-header>
     <van-form @submit="onSubmit">
-      <van-field v-model="bankName" name="银行" label="银行" placeholder="请输入银行" />
-      <van-field v-model="cardNumber" name="卡号" label="卡号" placeholder="请输入银行卡号" />
+      <van-field v-model="formData.bankName" name="银行名称" label="银行名称" placeholder="请输入银行名称" autocomplete="off"/>
+      <van-field v-model="formData.cardNumber" name="银行卡号" label="银行卡号" placeholder="请输入银行卡号" autocomplete="off"/>
+      <van-field v-model="formData.cardholder" name="持卡人" label="持卡人" placeholder="请输入持卡人" autocomplete="off"/>
       <div style="margin: 16px;">
         <van-button round block type="info" native-type="submit">提交</van-button>
       </div>
@@ -21,8 +22,7 @@ export default {
         title: "添加银行卡",
         isLeftArrow: true
       },
-      bankName: "",
-      cardNumber: ""
+      formData: {},
     };
   },
   components: {
@@ -31,9 +31,16 @@ export default {
     "van-field": Field,
     "van-button": Button
   },
+  created() {
+    this.formData = this.$route.query.obj ? JSON.parse(this.$route.query.obj) : {};
+  },
   methods: {
-    onSubmit(values) {
-      console.log("submit", values);
+    onSubmit() {
+      let params = this.formData;
+      params.userCode = this.$storage.getItem("userInfo").userCode;
+      this.$https.post(this.$api.common.addCard, params).then((res) => {
+        this.$router.go(-1);
+      })
     }
   }
 };

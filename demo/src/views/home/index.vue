@@ -17,7 +17,7 @@
     <hl-grid :grid="grid" :columnNum="columnNum" @toPage="toPage" />
     <hl-deadline />
     <div class="recommendTitle">
-      <img src="../../../static/image/carLogo.png" />
+      <img src="../../assets/image/carLogo.png" />
       <span>推荐商品</span>
     </div>
     <hl-recommend />
@@ -45,25 +45,25 @@ export default {
       grid: [
         {
           text: "特惠专区",
-          icon: "../../../static/image/tehui.png",
+          icon: require('../../assets/image/tehui.png'),
           path: "/recommendationZone",
           type: 4,
         },
         {
           text: "爆款专区",
-          icon: "../../../static/image/baokuan.png",
+          icon: require('../../assets/image/baokuan.png'),
           path: "/recommendationZone",
           type: 1,
         },
         {
           text: "低价专区",
-          icon: "../../../static/image/dijia.png",
+          icon: require('../../assets/image/dijia.png'),
           path: "/recommendationZone",
           type: 2,
         },
         {
           text: "积分专区",
-          icon: "../../../static/image/jifen.png",
+          icon: require('../../assets/image/jifen.png'),
           path: "/integralRegion",
           type: 3,
         },

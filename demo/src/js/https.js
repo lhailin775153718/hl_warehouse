@@ -13,7 +13,8 @@ export default {
                 method: 'get',
                 params: _params || {},
                 headers: {
-                    'token': Storage.getItem('userInfo').token,
+                    // 'token': Storage.getItem('userInfo').token,
+                    'token': 'TOKEN_468fbe5799604ade98cf9e23e7ac99dd',
                 }
             }).then(res => {
                 resolve(res);
@@ -32,8 +33,9 @@ export default {
                 method: 'post',
                 data: _params || {},
                 headers: {
-                    'token': Storage.getItem('userInfo').token,
-                    'Content-Type': isFormData ? 'application/x-www-form-urlencoded;charset=utf-8' : 'application/json;charset=utf-8'
+                    // 'token': Storage.getItem('userInfo').token,
+                    'token': 'TOKEN_468fbe5799604ade98cf9e23e7ac99dd',
+                    'Content-Type': isFormData ? 'multipart/form-data' : 'application/json;charset=utf-8'
                 }
             }).then(res => {
                 resolve(res);
