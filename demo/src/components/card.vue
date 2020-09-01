@@ -19,7 +19,7 @@
         >
           <img
             class="checkBox"
-            :src="items.checked ? '../assets/image/check.png' : '../assets/image/check-bg.png'"
+            :src="items.checked ? require('../assets/image/check.png') : require('../assets/image/check-bg.png')"
             alt
             @click.stop="checkItem(items)"
           />
@@ -52,7 +52,7 @@
     <div class="total">
       <img
         class="total-checkBox"
-        :src="checked ? '../assets/image/check.png' : '../assets/image/check-bg.png'"
+        :src="checked ? require('../assets/image/check.png') : require('../assets/image/check-bg.png')"
         alt
         @click="checkTotal()"
       />
@@ -265,6 +265,10 @@ export default {
         span {
           color: #747474;
           font-size: 12px;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+          width: 120px;
         }
         img {
           height: 4px;

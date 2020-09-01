@@ -75,7 +75,7 @@ import {
 } from "vant";
 import Storage from "../js/storage";
 export default {
-  props: ["detail"],
+  props: ["detail", "activityId"],
   data() {
     return {
       imageUrl: this.$https.imageUrl,
@@ -155,9 +155,13 @@ export default {
           }
         });
       });
+      
       let params = {
         code: this.priceCode,
       };
+      if(this.activityId) {
+        params.activityId = this.activityId;
+      }
       let that = this;
       this.$https.get(that.$api.common.getPrice, params).then((res) => {
         this.price = res.data.data == null ? 0 : res.data.data.price;
@@ -274,6 +278,7 @@ export default {
           background-color: #f7f4f8;
           margin-right: 10px;
           margin-top: 10px;
+          border: 1px solid #f7f4f8;
         }
       }
     }
@@ -307,9 +312,9 @@ export default {
   }
 }
 .itemsActive {
-  border: 1px solid #da251c;
+  border: 1px solid #da251c !important;
   background-color: #ffffff !important;
-  color: #da251c;
+  color: #da251c !important;
 }
 .recommendTitle {
   display: flex;

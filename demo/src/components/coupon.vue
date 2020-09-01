@@ -1,30 +1,23 @@
 <template>
   <div>
-    <hl-header :header="header"></hl-header>
-    <div class="column" v-for="(item,index) in list" :key="index">
+    <div class="column" v-for="(item,index) in list" :key="index" @click="pickCoupon(item)">
       <div class="columnLeft">{{item.preset/100}}</div>
       <div class="columnRight">
         <div class="name">{{item.actName}}</div>
         <div class="condition">111</div>
         <div class="time">有效期至:{{item.endTime}}</div>
       </div>
-      <div class="btn" v-if="item.receive != 1">立刻领取</div>
-      <img class="statusImage" v-if="item.receive == 1" src="../../assets/image/coupon1.png" alt />
+      <div class="btn" v-if="item.isReceived != 1" @click="userReceive(item)">立刻领取</div>
+      <img class="statusImage" v-if="item.isReceived == 1" src="../assets/image/coupon1.png" alt />
     </div>
   </div>
 </template>
 
 <script>
-import header from "@/components/header";
-import { Cell } from "vant";
 export default {
   data() {
     return {
       imageUrl: this.$https.imageUrl,
-      header: {
-        title: "我的优惠券",
-        isLeftArrow: true,
-      },
       list: [],
       selectInfo: {
         userCode: this.$storage.getItem("userInfo").userCode,
@@ -35,27 +28,31 @@ export default {
     };
   },
   components: {
-    "hl-header": header,
-    "van-cell": Cell,
   },
   created() {
-    this.getCoupon();
   },
   methods: {
-    getCoupon() {
+    getCoupon(shopCode) {
       let params = {
         page: 1,
         pageSize: 10,
         userCode: this.$storage.getItem("userInfo").userCode,
         actStatus: 2,
+        shopCode: shopCode
       };
       let that = this;
-      this.$https.get(that.$api.common.getCoupon, params).then((res) => {
+      this.$https.get(that.$api.common.getShopCoupon, params).then((res) => {
         console.log(res);
         let array = res.data.data.records;
         this.list = array;
       });
     },
+    userReceive(item) {
+      this.$emit('userReceive', item);
+    },
+    pickCoupon(item) {
+      this.$emit('pickCoupon', item);
+    }
   },
 };
 </script>

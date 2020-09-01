@@ -6,13 +6,15 @@
 </template>
 
 <script>
-import tabbar from "@/components/tabbar";
+import tabbar from "@/components/tabbarBusiness";
 export default {
   data() {
     return {};
   },
   components: {
     tabbar
+  },
+  created() {
   }
 };
 </script>

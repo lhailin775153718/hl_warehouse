@@ -81,7 +81,10 @@ export default {
   },
   created() {
     this.getSwiperImage();
-    // this.getActivity();
+    let code = this.$route.query.code;
+    if(code) {
+      this.getVXUserInfo(code);
+    }
   },
   methods: {
     getSwiperImage() {
@@ -108,6 +111,17 @@ export default {
           text: val.text,
           type: val.type,
         },
+      });
+    },
+    //获取微信用户信息
+    getVXUserInfo(code) {
+      let params = {
+        code: code,
+        userCode: this.$storage.getItem("userInfo").userCode,
+        sdk: "JS_SDK"
+      }
+      this.$https.get(this.$api.common.getVXUserInfo, params).then((res) => {
+        console.log(res)
       });
     },
   },

@@ -13,8 +13,9 @@ export default {
                 method: 'get',
                 params: _params || {},
                 headers: {
-                    // 'token': Storage.getItem('userInfo').token,
-                    'token': 'TOKEN_468fbe5799604ade98cf9e23e7ac99dd',
+                    'source': 'H5',
+                    'token': Storage.getItem('userInfo').token,
+                    // 'token': 'TOKEN_fbfd5db990104332ab52adf79dc4b2d1',
                 }
             }).then(res => {
                 resolve(res);
@@ -33,8 +34,9 @@ export default {
                 method: 'post',
                 data: _params || {},
                 headers: {
-                    // 'token': Storage.getItem('userInfo').token,
-                    'token': 'TOKEN_468fbe5799604ade98cf9e23e7ac99dd',
+                    'source': 'H5',
+                    'token': Storage.getItem('userInfo').token,
+                    // 'token': 'TOKEN_fbfd5db990104332ab52adf79dc4b2d1',
                     'Content-Type': isFormData ? 'multipart/form-data' : 'application/json;charset=utf-8'
                 }
             }).then(res => {

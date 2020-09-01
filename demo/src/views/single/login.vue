@@ -36,13 +36,11 @@ export default {
     "hl-divider": divider,
   },
   created() {
-    // let data = window.location.href;
-    let a = this.GetUrlParam('code');
-    console.log(a)
+    this.code = this.GetUrlParam('code');
   },
   methods: {
     getCode() {
-      if (this.phoneNumbe == "") {
+      if (this.phoneNumber == "") {
         this.$toast("请输入手机号");
         return;
       }
@@ -98,6 +96,7 @@ export default {
           that.$storage.setItem("userInfo", res.data.data);
           that.$router.replace({
             path: "/home",
+            code: this.code
           });
         } else {
           that.$toast(res.data.message);

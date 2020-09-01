@@ -1,19 +1,25 @@
 <template>
   <div>
     <hl-header :header="header"></hl-header>
-    <van-search v-model="searchText" placeholder="请输入搜索关键词" />
-    <div style="margin-top:1px;">
-      <hl-screening />
-    </div>
 
     <div class="list">
-      <div class="item" :class="{'item-active':index == 0}" v-for="(item,index) in list" :key="index" @click="toDetail(item)">
-        <img class="itemImage" :src="imageUrl + item.image" alt />
-        <div class="itemRight">
-          <p class="itemTitle">{{item.goodsName}}</p>
-          <span class="itemNum">{{item.sales}}</span>
-          <span class="itemPirce">{{(item.price/100).toFixed(2)}}</span>
-          <img class="itemIcon" src="../../assets/image/carLogo.png" alt />
+      <div
+        class="item"
+        :class="{'item-active':index == 0}"
+        v-for="(item,index) in list"
+        :key="index"
+        @click="toDetail(item)"
+      >
+        <div style="display: flex;">
+          <img class="itemImage" :src="imageUrl + item.image" alt />
+          <div class="itemRight">
+            <p class="itemTitle">{{item.goodsName}}</p>
+            <span class="itemNum">{{item.sales}}</span>
+            <span class="itemPirce">{{(item.price/100).toFixed(2)}}</span>
+          </div>
+        </div>
+        <div class="item-bottom">
+          
         </div>
       </div>
     </div>
@@ -28,42 +34,37 @@ export default {
   data() {
     return {
       imageUrl: this.$https.imageUrl,
-      isLoading: false,
       header: {
-        title: "分类",
+        title: "商品管理",
         isLeftArrow: true,
       },
-      searchText: "",
       list: [],
       selectForm: {
         page: 1,
         pageSize: 20,
+        shopCode: "87392731"
       },
     };
   },
   components: {
     "hl-header": header,
-    "van-search": Search,
-    "hl-screening": screening,
   },
   created() {
-    this.getQuery();
-    this.getActivityList();
+    this.getList();
   },
   methods: {
-    getQuery() {
-      this.selectForm.categorySecondCode = this.$route.query.categoryId;
-    },
-    getActivityList() {
+    getList() {
       let params = this.selectForm;
       let that = this;
-      this.$https.get(that.$api.common.GoodsList, params).then((res) => {
-        this.list = res.data.data.records;
-      });
+      this.$https
+        .get(that.$api.common.GoodsList, params)
+        .then((res) => {
+          this.list = res.data.data.records;
+        });
     },
     toDetail(val) {
       this.$router.push({
-        path: "goodsDetail",
+        path: "businessGoodsDetail",
         query: {
           obj: JSON.stringify(val),
         },
@@ -99,9 +100,10 @@ export default {
         width: 247.5px;
         position: absolute;
         left: 11.5px;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
+        overflow: hidden;  
+        display: -webkit-box;  
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical; 
       }
       .itemNum {
         color: #959595;

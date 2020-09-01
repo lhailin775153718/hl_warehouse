@@ -42,9 +42,11 @@ const shopCouponComponent = resolve => require(['@/views/mine/shopCoupon'], reso
 const paymentComponent = resolve => require(['@/views/mine/payment'], resolve) //付款方式
 
 //business
-// const businessComponent = resolve => require(['@/views/mine/business/business'], resolve) //商家端主页
-const businessOrderListComponent = resolve => require(['@/views/mine/business/businessOrderList'], resolve) //商家端主页
-
+const businessComponent = resolve => require(['@/views/mine/business/business'], resolve) //商家端主页
+const businessOrderListComponent = resolve => require(['@/views/mine/business/businessOrderList'], resolve) //商家订单
+const businessGoodsListComponent = resolve => require(['@/views/mine/business/businessGoodsList'], resolve) //商家商品
+const businessCouponComponent = resolve => require(['@/views/mine/business/businessCoupon'], resolve) //商家优惠券
+const businessGoodsDetailComponent = resolve => require(['@/views/mine/business/businessGoodsDetail'], resolve) //商家优惠券
 
 import mine from '@/views/mine/Mmine/router'
 
@@ -89,8 +91,20 @@ const router = new Router({
         { path: '/shopCoupon', component: shopCouponComponent },
         { path: '/payment', component: paymentComponent },
 
-        // { path: '/business', component: businessComponent },
-        { path: '/businessOrderList', component: businessOrderListComponent },
+        {
+            path: '/business',
+            component: businessComponent,
+            redirect: '/businessOrderList',
+            children: [
+                { path: '/businessOrderList', component: businessOrderListComponent },
+                { path: '/businessGoodsList', component: businessGoodsListComponent },
+                { path: '/businessCoupon', component: businessCouponComponent },
+                // { path: '/businessGoodsDetail', component: businessGoodsDetailComponent },
+            ]
+        },
+        { path: '/businessGoodsDetail', component: businessGoodsDetailComponent },
+
+        // { path: '/businessOrderList', component: businessOrderListComponent },
     ]
 })
 

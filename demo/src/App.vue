@@ -19,7 +19,8 @@ export default {
   components: {
     tabbar
   },
-  created() {},
+  created() {
+  },
   methods: {
     routerChange() {
       let path = this.$route.path;

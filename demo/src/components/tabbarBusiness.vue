@@ -25,11 +25,11 @@ export default {
           value: "订单"
         },
         {
-          path: "/sort",
+          path: "/businessGoodsList",
           value: "商品"
         },
         {
-          path: "/car",
+          path: "/businessCoupon",
           value: "优惠券"
         },
       ]
@@ -40,7 +40,7 @@ export default {
     "van-tabbar-item": TabbarItem
   },
   mounted() {
-    // this.tabbarActive();
+    this.tabbarActive();
   },
   watch: {
     $route(to, from) {

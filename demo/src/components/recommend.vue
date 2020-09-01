@@ -21,7 +21,7 @@
             <span class="Currency">￥</span>
             {{(item.price/100).toFixed(2)}}
           </span>
-          <img class="contentImage" src="../assets/image/carLogo.png" />
+          <!-- <img class="contentImage" src="../assets/image/carLogo.png" /> -->
         </div>
       </div>
     </div>
@@ -40,6 +40,7 @@ export default {
         page: 1,
         pageSize: 10,
         sort: "sales",
+        orderBy: "desc"
       },
       finished: false,
       loading: false,

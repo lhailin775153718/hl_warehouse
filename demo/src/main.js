@@ -9,6 +9,7 @@ import Storage from './js/storage'
 import Api from './js/api'
 import CommonFn from './js/commonFn'
 import qs from 'qs'
+import './util/rem'
 
 // import Vant from 'vant';
 import 'vant/lib/index.css';

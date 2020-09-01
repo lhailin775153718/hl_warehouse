@@ -44,20 +44,12 @@ export default {
   methods: {
     initialize() {
       this.tabForm.goodsParams = JSON.parse(this.tabForm.goodsParams);
-      // console.log(this.tabForm.goodsParams);
       for (let i in this.tabForm.goodsParams) {
         let temp = new Object;
         temp.key = i;
         temp.value = this.tabForm.goodsParams[i];
         this.goodsParams.push(temp);
       }
-      // console.log(this.goodsParam,"==========")
-      // console.log(this.tabForm.goodsParams);
-      // console.log(Object.keys(this.tabForm.goodsParams));
-      // Object.keys(this.tabForm.goodsParams).map((item, index) => {
-      //   console.log(item);
-      //   console.log(index);
-      // });
     },
   },
 };
@@ -68,5 +60,8 @@ export default {
   background-color: #ffffff;
   padding: 15px;
   box-sizing: border-box;
+  /deep/ img {
+    width: 100%;
+  }
 }
 </style>

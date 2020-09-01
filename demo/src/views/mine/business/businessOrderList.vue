@@ -54,7 +54,7 @@ export default {
       selectForm: {
         page: 1,
         pageSize: 10,
-        shopCode: "",
+        shopCode: "87392731",
         orderNo: "",
         userCode: this.$storage.getItem("userInfo").userCode,
         startTime: "",
@@ -67,7 +67,6 @@ export default {
     "hl-header": () => import("@/components/header"),
   },
   created() {
-    console.log("进来了")
     this.getOrderList();
   },
   methods: {

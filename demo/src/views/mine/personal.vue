@@ -10,7 +10,7 @@
       <van-cell class="name" title="昵称" :value="userDetail.name" is-link center @click="showName = true" />
       <van-cell class="name" title="手机号" :value="userDetail.phone" is-link center @click="showPhone = true" />
       <van-cell title="性别" :value="userDetail.sexVal" is-link center  @click="showSex = true" />
-      <van-cell title="生日" :value="userDetail.status" is-link center @click="showDate = true" />
+      <!-- <van-cell title="生日" :value="userDetail.status" is-link center @click="showDate = true" /> -->
     </van-cell-group>
 
     <van-action-sheet v-model="show" :actions="actions" cancel-text="取消" close-on-click-action @select="onSelect" @cancel="onCancel"/>

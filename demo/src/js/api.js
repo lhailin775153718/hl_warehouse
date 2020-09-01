@@ -1,4 +1,6 @@
 const common = {
+    getVXUserInfo: '/wx/getUserInfo', //获取微信用户信息
+    wxPay: '/pay/wxPay/unifiedOrder', //微信支付统一下单
     getCode: '/system/sms/sendSms', //获取验证码
     register: '/user/register', //注册
     login: '/user/login', //登录
@@ -11,7 +13,7 @@ const common = {
     getGoodsDetail: '/goods/getInfo', //获取商品详情
 
     goodsCategory: '/goods/goodsCategory/getList', //商品分类列表
-    goodsCategoryList: '/goods/goodsCategory/getInfo', //获取分类详情
+    goodsCategoryDetail: '/goods/goodsCategory/getInfo', //获取分类详情
 
     addCollect: '/goods/collect/addCollect', //添加收藏
     cancelCollect: '/goods/collect/cancelCollect', //取消收藏
@@ -38,6 +40,7 @@ const common = {
 
     getShop: '/shop/getShopInfo', //获取小店详情
     getShopCoupon: '/activity/getPage', //小店获取优惠券
+    userReceive: '/activity/receive/userReceive', //领券
 
     getAccountLog: '/user/accountLog/getPage', //获取用户交易流水
 

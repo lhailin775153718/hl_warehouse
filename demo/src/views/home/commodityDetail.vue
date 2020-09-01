@@ -9,15 +9,15 @@
     <div class="detailContent">
       <p class="goodsName">{{goodsDetail.goodsName}}</p>
       <div class="goodsProp">
-        <span class="price">{{(goodsDetail.price/100).toFixed(2)}}</span>
+        <span class="price">{{(goodsDetail.price/100).toFixed(2)}}<span class="yuanjia">{{(goodsDetail.originalPrice/100).toFixed(2)}}</span></span>
         <div class="goodsProp-right">
           <span class="num">已售{{goodsDetail.sales}}件</span>
-          <img :src="goodsDetail.isCollect ? '../../assets/image/follow-act.png' : '../../assets/image/follow-bg.png'" @click="collect" />
+          <img :src="goodsDetail.isCollect ? require('../../assets/image/follow-act.png') : require('../../assets/image/follow-bg.png')" @click="collect" />
         </div>
       </div>
     </div>
     <hl-tab style="margin-top:10px;margin-bottom:50px;" v-if="goodsDetail.goodsDetail" :tabForm="goodsDetail.goodsDetail" />
-    <hl-goodsAction v-if="goodsDetail" :detail="goodsDetail" />
+    <hl-goodsAction v-if="goodsDetail" :detail="goodsDetail" :activityId="goodsDetail.activityId" />
   </div>
 </template>
 
@@ -158,5 +158,11 @@ export default {
       }
     }
   }
+}
+.yuanjia {
+  text-decoration: line-through;
+  color: #797b7d;
+  margin-left: 10px;
+  font-size: 14px;
 }
 </style>

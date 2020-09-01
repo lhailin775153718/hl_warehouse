@@ -9,7 +9,7 @@
         <div class="time">有效期至:{{item.endTime}}</div>
       </div>
       <div class="btn" v-if="item.receive != 1">立刻领取</div>
-      <img class="statusImage" v-if="item.receive == 1" src="../../assets/image/coupon1.png" alt />
+      <img class="statusImage" v-if="item.receive == 1" src="../../../assets/image/coupon1.png" alt />
     </div>
   </div>
 </template>
@@ -46,11 +46,10 @@ export default {
       let params = {
         page: 1,
         pageSize: 10,
-        userCode: this.$storage.getItem("userInfo").userCode,
-        actStatus: 2,
+        shopCode: "87392731",
       };
       let that = this;
-      this.$https.get(that.$api.common.getCoupon, params).then((res) => {
+      this.$https.get(that.$api.common.getShopCoupon, params).then((res) => {
         console.log(res);
         let array = res.data.data.records;
         this.list = array;

@@ -5,18 +5,12 @@
       <div class="blockA img"></div>
       <div class="blockB">
         <div>{{address.receiver}} {{address.phone}}</div>
-        <div
-          class="address"
-        >地址:{{address.provinceName + address.cityName + address.districtName + address.detail}}</div>
+        <div class="address" >地址:{{address.provinceName + address.cityName + address.districtName + address.detail}}</div>
       </div>
       <div class="blockA img2"></div>
     </div>
 
-    <div
-      class="commodityContainer"
-      v-for="(item,index) in orderData.settlementShopGoodsList"
-      :key="index"
-    >
+    <div class="commodityContainer" v-for="(item,index) in orderData.settlementShopGoodsList" :key="index" >
       <div class="commodityTop">
         <div class="icon"></div>
         <div class="title">{{item.shopName}}</div>
@@ -45,36 +39,20 @@
       <div class="itemC">
         <textarea v-model="item.remark" placeholder="给卖家留言..."></textarea>
       </div>
+      <van-cell title="优惠券" :value="item.couponText" is-link center @click="showCoupon(item)" />
     </div>
-
-    <!-- <div class="itemC">
-      <textarea placeholder="给卖家留言..."></textarea>
-    </div>
-
-    <div class="itemD">
-      <div class="flex_c_sb itemList" v-for="(item, index) in orderData.itemBlist" :key="index">
-        <div class="key">{{item.name}}</div>
-        <div class="value">{{item.value}}</div>
-      </div>
-      <div class="itemPrice" style="text-align: right">
-        <span>共{{count}}件商品,合计</span>
-        ￥{{price}}
-      </div>
-    </div>-->
 
     <van-cell-group style="margin-top:10px;">
-      <van-cell title="支付方式" :value="pay" is-link center @click="toPage('/payment')" />
+      <van-cell title="支付方式" :value="payTypeText" is-link center @click="payTypeShow = true" />
       <van-cell title="可以用500金币抵￥5.00" center>
         <template #right-icon>
           <van-switch v-model="checked" size="20" active-color="#D8674D" inactive-color="#f5f5f5" />
         </template>
       </van-cell>
-      <!-- <van-cell title="优惠券" is-link center /> -->
     </van-cell-group>
 
     <van-cell-group style="margin-top:10px;margin-bottom:70px;">
       <van-cell title="商品金额" :value="'￥' + (price/100).toFixed(2)" center />
-      <!-- <van-cell title="+运费" value="7" center></van-cell> -->
       <van-cell title="-优惠券折扣" :value="count" center />
     </van-cell-group>
 
@@ -85,11 +63,24 @@
       <span class="price">{{(price/100-count).toFixed(2)}}</span>
       <div class="submitOrder" @click="submitOrder">提交订单</div>
     </div>
+
+    <van-popup v-model="payTypeShow" position="bottom">
+      <van-picker show-toolbar :columns="payTypeList" @confirm="onPayTypeValue" @cancel="payTypeShow = false" />
+    </van-popup>
+
+    <van-popup v-model="couponShow" position="right" style="width: 100%;">
+      <div class="popupHeader" @click="couponShow = false">
+        <van-icon size="16" name="arrow-left"/>
+        <span>确定</span>
+      </div>
+      <hl-coupon ref="coupon" @userReceive="userReceive" @pickCoupon="pickCoupon" />
+    </van-popup>
   </div>
 </template>
 
 <script>
-import { Stepper, Cell, CellGroup, Switch } from "vant";
+import { Stepper, Cell, CellGroup, Switch, Popup, Picker, Icon } from "vant";
+import coupon from '@/components/coupon'
 export default {
   data() {
     return {
@@ -109,7 +100,12 @@ export default {
         page: 1,
         pageSize: 1,
       },
-      pay: "",
+      payType: "",
+      payTypeText: "",
+      payTypeShow: false,
+      payTypeList: [{ text: "余额", value: 1}, { text: "微信支付", value: 3}],
+      couponShow: false,
+      item: {},
     };
   },
   components: {
@@ -118,6 +114,10 @@ export default {
     "van-cell": Cell,
     "van-cell-group": CellGroup,
     "van-switch": Switch,
+    "van-popup": Popup,
+    "van-picker": Picker,
+    "hl-coupon": coupon,
+    "van-icon": Icon
   },
   created() {
     this.getQuery();
@@ -165,17 +165,80 @@ export default {
       });
     },
     submitOrder() {
+      if(this.payType == "") {
+        this.$toast.fail("请选择支付方式");
+        return;
+      }
       let that = this;
       let params = this.orderData;
-      params.payType = 1;
+      params.payType = this.payType;
       params.address = this.address;
       this.$https.post(that.$api.common.createOrder, params).then((res) => {
-        this.$toast.success("支付成功");
-        setTimeout(() => {
-          that.$router.replace("/orderList");
-        }, 2000);
+        if(this.payType == 1) {
+          this.$toast.success("支付成功");
+          setTimeout(() => {
+            that.$router.replace("/orderList");
+          }, 2000);
+        } else {
+          this.wxPay(res.data.data.orderNo);
+        }
       });
     },
+    wxPay(orderNo) {
+      let that = this;
+      let params = {
+        orderNo: orderNo,
+        payType: "JSAPI",
+        userCode: this.$storage.getItem("userInfo").userCode,
+        appId: "wx1bdbdd9e8b85ff2f"
+      }
+      this.$https.post(that.$api.common.wxPay, params).then((res) => {
+        this.onBridgeReady(res);
+      });
+    },
+    onBridgeReady(obj) {
+      WeixinJSBridge.invoke(
+      'getBrandWCPayRequest', {
+         "appId": obj.data.data.appId,     //公众号名称，由商户传入     
+         "timeStamp": obj.data.data.timeStamp,         //时间戳，自1970年以来的秒数     
+         "nonceStr": obj.data.data.nonceStr, //随机串     
+         "package": obj.data.data.package,     
+         "signType":"MD5",         //微信签名方式：     
+         "paySign": obj.data.data.paySign //微信签名 
+      },function(res){
+      if(res.err_msg == "get_brand_wcpay_request:ok" ){
+      // 使用以上方式判断前端返回,微信团队郑重提示：
+            //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
+          } 
+      }); 
+    },
+    onPayTypeValue(obj) {
+      this.payTypeText = obj.text;
+      this.payType = obj.value;
+      this.payTypeShow = false;
+    },
+    showCoupon(item) {
+      this.couponShow = true;
+      this.item = item;
+      this.$nextTick(function() {
+        this.$refs.coupon.getCoupon(item.shopCode);
+      })
+    },
+    userReceive(val) {
+      let that = this;
+      let params = {
+        actCode: val.actCode,
+        userCode: this.$storage.getItem("userInfo").userCode,
+      }
+      this.$https.post(that.$api.common.userReceive, params).then((res) => {
+        this.showCoupon(this.item);
+      });
+    },
+    pickCoupon(val) {
+      console.log(val)
+      this.item.couponText = val.actName;
+      this.couponShow = false;
+    }
   },
 };
 </script>
