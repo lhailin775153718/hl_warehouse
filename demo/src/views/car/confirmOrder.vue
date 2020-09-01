@@ -38,17 +38,17 @@
       </div>
       <div class="itemC">
         <textarea v-model="item.remark" placeholder="给卖家留言..."></textarea>
-      </div>
-      <van-cell title="优惠券" :value="item.couponText" is-link center @click="showCoupon(item)" />
+      </div>s
+<!--      <van-cell title="优惠券" :value="item.couponText" is-link center @click="showCoupon(item)" />-->
     </div>
 
     <van-cell-group style="margin-top:10px;">
       <van-cell title="支付方式" :value="payTypeText" is-link center @click="payTypeShow = true" />
-      <van-cell title="可以用500金币抵￥5.00" center>
-        <template #right-icon>
-          <van-switch v-model="checked" size="20" active-color="#D8674D" inactive-color="#f5f5f5" />
-        </template>
-      </van-cell>
+<!--      <van-cell title="可以用500金币抵￥5.00" center>-->
+<!--        <template #right-icon>-->
+<!--          <van-switch v-model="checked" size="20" active-color="#D8674D" inactive-color="#f5f5f5" />-->
+<!--        </template>-->
+<!--      </van-cell>-->
     </van-cell-group>
 
     <van-cell-group style="margin-top:10px;margin-bottom:70px;">
@@ -199,18 +199,18 @@ export default {
     onBridgeReady(obj) {
       WeixinJSBridge.invoke(
       'getBrandWCPayRequest', {
-         "appId": obj.data.data.appId,     //公众号名称，由商户传入     
-         "timeStamp": obj.data.data.timeStamp,         //时间戳，自1970年以来的秒数     
-         "nonceStr": obj.data.data.nonceStr, //随机串     
-         "package": obj.data.data.package,     
-         "signType":"MD5",         //微信签名方式：     
-         "paySign": obj.data.data.paySign //微信签名 
+         "appId": obj.data.data.appId,     //公众号名称，由商户传入
+         "timeStamp": obj.data.data.timeStamp,         //时间戳，自1970年以来的秒数
+         "nonceStr": obj.data.data.nonceStr, //随机串
+         "package": obj.data.data.package,
+         "signType":"MD5",         //微信签名方式：
+         "paySign": obj.data.data.paySign //微信签名
       },function(res){
       if(res.err_msg == "get_brand_wcpay_request:ok" ){
       // 使用以上方式判断前端返回,微信团队郑重提示：
             //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
-          } 
-      }); 
+          }
+      });
     },
     onPayTypeValue(obj) {
       this.payTypeText = obj.text;

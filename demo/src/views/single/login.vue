@@ -30,13 +30,15 @@ export default {
       show: true,
       count: "",
       timer: null,
+      wxCode: "",
     };
   },
   components: {
     "hl-divider": divider,
   },
   created() {
-    this.code = this.GetUrlParam('code');
+    this.wxCode = this.GetUrlParam('code');
+    console.log('code', this.wxCode)
   },
   methods: {
     getCode() {
@@ -96,7 +98,9 @@ export default {
           that.$storage.setItem("userInfo", res.data.data);
           that.$router.replace({
             path: "/home",
-            code: this.code
+            query: {
+              code: this.wxCode
+            }
           });
         } else {
           that.$toast(res.data.message);
@@ -108,25 +112,46 @@ export default {
         path: "/register",
       });
     },
-    GetUrlParam(paraName) {
-      var url = document.location.toString();
-      // var url = 'http://shopkeeper-mp.gdkeyong.com/mp/dist/index.html?code=0213AyFa1JAdtz09p9Ia1Umz3t43AyFH&state=STATE#/login';
-      var arrObj = url.split("?");
-      if (arrObj.length > 1) {
-        var arrPara = arrObj[1].split("&");
-        var arr;
-        for (var i = 0; i < arrPara.length; i++) {
-          arr = arrPara[i].split("=");
-          if (arr != null && arr[0] == paraName) {
-            return arr[1];
-          }
+    GetUrlParam(paraName){
+      try
+      {
+        let url = window.location.href
+        if (url.indexOf(paraName + '=') > -1) {
+          // console.log('123')
+          let array = url.split(paraName + '=')[1]
+          let data =array.split('&')[0]
+          // console.log(data)
+          return data
+        } else {
+          // console.log('789')
+          return ''
         }
-        return "";
       }
-      else {
-        return "";
+      catch(err)
+      {
+        console.log(err)
+        return  ''
       }
     }
+    // GetUrlParam(paraName) {
+    //   var url = document.location.toString();
+    //   // var url = 'http://shopkeeper-mp.gdkeyong.com/mp/dist/index.html?code=0213AyFa1JAdtz09p9Ia1Umz3t43AyFH&state=STATE#/login';
+    //   var arrObj = url.split("?");
+    //   if (arrObj.length > 1) {
+    //     var arrPara = arrObj[1].split("&");
+    //     var arr;
+    //     for (var i = 0; i < arrPara.length; i++) {
+    //       arr = arrPara[i].split("=");
+    //       if (arr != null && arr[0] == paraName) {
+    //         return arr[1];
+    //       }
+    //     }
+    //     return "";
+    //   }
+    //   else {
+    //     return "";
+    //   }
+    // }
   },
 };
 </script>

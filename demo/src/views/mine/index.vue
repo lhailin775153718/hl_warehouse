@@ -45,10 +45,10 @@
       <van-cell title="银行卡管理" @click="toPage('/bankCard')" is-link center :icon="require('../../assets/image/yinhangka.png')" />
       <van-cell title="地址管理" @click="toPage('/addressList')" is-link center :icon="require('../../assets/image/dizhi.png')" />
     </van-cell-group>
-    <van-cell-group>
+<!--    <van-cell-group>-->
       <!-- <van-cell title="帮助中心" @click="toPage('/commission')" is-link center icon="../../assets/image/bangzhu.png" /> -->
-      <van-cell title="商家端" @click="toPage('/business')" is-link center :icon="require('../../assets/image/guanyuwomen.png')" />
-    </van-cell-group>
+<!--      <van-cell title="商家端" @click="toPage('/business')" is-link center :icon="require('../../assets/image/guanyuwomen.png')" />-->
+<!--    </van-cell-group>-->
   </div>
 </template>
 
