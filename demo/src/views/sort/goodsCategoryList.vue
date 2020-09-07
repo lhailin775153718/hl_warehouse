@@ -3,7 +3,7 @@
     <hl-header :header="header"></hl-header>
     <van-search v-model="searchText" placeholder="请输入搜索关键词" />
     <div style="margin-top:1px;">
-      <hl-screening />
+      <hl-screening @dropdownChange="dropdownChange" @sure="sure" />
     </div>
 
     <div class="list">
@@ -38,7 +38,10 @@ export default {
       selectForm: {
         page: 1,
         pageSize: 20,
+        categorySecondCode: ''
       },
+      screenData: {},
+      sureData: {},
     };
   },
   components: {
@@ -51,11 +54,23 @@ export default {
     this.getActivityList();
   },
   methods: {
+    dropdownChange(data) {
+      console.log(' dropdownChange', data)
+      // this.screenData = data
+      this.getActivityList()
+    },
+    sure(data) {
+      console.log(' sureData', data)
+      this.sureData = data
+      // this.getActivityList()
+    },
     getQuery() {
       this.selectForm.categorySecondCode = this.$route.query.categoryId;
     },
     getActivityList() {
-      let params = this.selectForm;
+      let params = Object.assign({}, this.selectForm, this.screenData, this.sureData);
+      console.log(params)
+      console.log(this.selectForm)
       let that = this;
       this.$https.get(that.$api.common.GoodsList, params).then((res) => {
         this.list = res.data.data.records;

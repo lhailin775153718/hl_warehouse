@@ -1,27 +1,22 @@
 <template>
   <main style="position:relative">
-    <div class="option">
-      <div v-for="(item, index) in option"  >
-        <div class="screen" v-if="item.type !== 'screen'" @click="itemCLick(item)">
-          <span :class="{select: item.select}"  class="screenText">{{item.text}}</span>
-        </div>
-        <div v-else class="screen" @click="showPopup">
-          <span class="screenText">筛选</span>
-          <img class="screenIcon" src="../assets/image/carLogo1.png" alt />
-        </div>
-      </div>
+    <van-dropdown-menu>
+      <van-dropdown-item v-model="value1" :options="option1" @change="dropdownChange" />
+      <!-- <van-dropdown-item v-model="value2" :options="option2" /> -->
+    </van-dropdown-menu>
+    <div class="screen" style="right:33.33%;">
+      <span class="screenText">价格</span>
     </div>
+    <div class="screen" @click="showPopup">
+      <span class="screenText">筛选</span>
+      <img class="screenIcon" src="../assets/image/carLogo1.png" alt />
+    </div>
+
     <van-popup v-model="show" position="right">
       <p class="popupTitle">筛选</p>
       <div class="popupContainer" v-for="(item,index) in popup" :key="index">
-        <span class="itemType">{{item.text}}</span>
-        <div class="Itemfield" v-if="item.type === 'field'">
-          <div v-for="(items, indexs) in item.opt" :key="indexs">
-            <van-field   v-model="items.value" :placeholder="items.placeholder" />
-          </div>
-
-        </div>
-        <div v-else class="itemOpt">
+        <span class="itemType">{{item.type}}</span>
+        <div class="itemOpt">
           <div
             :class="{'active':items.checked}"
             v-for="(items,indexs) in item.opt"
@@ -37,30 +32,42 @@
 </template>
 
 <script>
-import { DropdownMenu, DropdownItem, Popup, Field } from "vant";
+import { DropdownMenu, DropdownItem, Popup } from "vant";
 export default {
   props: ["selectForm"],
   data() {
     return {
-      option: [
-        { text: "销量", select: false , value: {orderBy: 'desc', sort: 'sales'}},
-        { text: "价格", select: false , value: {orderBy: 'desc', sort: 'active_price'}},
-        { text: "筛选", select: false , type: "screen" },
+      value1: "",
+      value2: "a",
+      option1: [
+        { text: "销量", value: "" },
+        { text: "最低销量", value: "aes" },
+        { text: "最高销量", value: "desc" },
+      ],
+      option2: [
+        { text: "价格", value: "a" },
+        { text: "最低价格", value: "b" },
+        { text: "最高价格", value: "c" },
       ],
       show: false,
       popup: [
         {
-          text: "价格",
-          type: 'field',
-          key: 'field',
+          type: "价格",
           opt: [
-            {value:'', type:"number", placeholder: '输入价格'},
-            {value:'', type:"number", placeholder: '输入价格'},
+            {
+              categoryName: "从低到高",
+              checked: false,
+              orderBy: "aes",
+            },
+            {
+              categoryName: "从高到低",
+              checked: false,
+              orderBy: "desc",
+            },
           ],
         },
         {
-          text: "分类",
-          key: 'categoryFirstCode',
+          type: "分类",
           opt: [],
         },
       ],
@@ -71,7 +78,6 @@ export default {
     "van-dropdown-menu": DropdownMenu,
     "van-dropdown-item": DropdownItem,
     "van-popup": Popup,
-    "van-field": Field,
   },
   created() {
     this.screenData = this.selectForm || {};
@@ -81,6 +87,7 @@ export default {
     getGoodsCategory() {
       let that = this;
       this.$https.get(that.$api.common.goodsCategory).then((res) => {
+        console.log('res', res)
         res.data.data.forEach((res) => {
           res.checked = false;
         });
@@ -99,45 +106,36 @@ export default {
     },
     sure() {
       this.show = false;
-      let data = {}
-      this.popup.forEach((res) => {
-        data[res.key] = null
+      this.popup.forEach((res, index) => {
         res.opt.forEach((res1) => {
-          if(res.type === 'field') {
-            if(!data[res.key]) {
-              data[res.key] = []
-            }
-            data[res.key].push(res1.value)
-          } else {
-            if(res1.checked) {
-              data[res.key] = res1.id
-            }
+          if (res1.checked && index == 0) {
+            this.screenData.sort = "active_price";
+            this.screenData.orderBy = res1.orderBy;
+          } else if (res1.checked && index == 1) {
+            this.screenData.categoryFirstCode = res1.id;
           }
-        })
+        });
       });
-      console.log(this.popup)
-      // console.log('data', data)
-      this.$emit("sure", data);
+      this.$emit("sure", this.screenData);
     },
     reset() {
-      // this.show = false;
+      this.show = false;
       this.popup.forEach((res1) => {
-          res1.opt.forEach((res) => {
-            if(res1.type === 'field') {
-              res.value = ''
-            } else {
-              res.checked = false;
-            }
-          });
+        res1.opt.forEach((res) => {
+          res.checked = false;
+        });
       });
+      this.value1 = "";
+      this.screenData = this.selectForm;
       this.$emit("reset", this.screenData);
     },
-    itemCLick(item) {
-      this.option.forEach(res => {
-        res.select= false
-      })
-      item.select = true
-      this.$emit("dropdownChange", item.value)
+    dropdownChange(val) {
+      console.log(this.screenData)
+      if (val) {
+        this.screenData.orderBy = val;
+      }
+      console.log(this.screenData)
+      this.$emit("dropdownChange", this.screenData);
     },
   },
 };
@@ -150,25 +148,14 @@ export default {
 /deep/.van-dropdown-menu__item--disabled .van-dropdown-menu__title {
   color: #323233;
 }
-.option{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  >div{
-    flex: 1;
-  }
-}
-.Itemfield{
-  display: flex;
-}
-.select{
-  color: #da251c !important;
-}
 .screen {
   display: flex;
   justify-content: center;
   align-items: center;
-  /*position: absolute;*/
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 33.33%;
   height: 48px;
   background-color: #ffffff;
   z-index: 100;
@@ -183,8 +170,6 @@ export default {
     margin-left: 5px;
   }
 }
-
-
 /deep/ .van-popup--right {
   height: 100%;
   width: 255px;

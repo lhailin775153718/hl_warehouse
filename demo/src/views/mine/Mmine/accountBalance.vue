@@ -6,27 +6,74 @@
         <span class="integralNum">{{userInfo.accountBalance/100}}</span>
         <span class="Company">元</span>
       </div>
-    </div>
-    <div class="itemB">
-      <div class="block"></div>
-      <div class="titleB">余额记录</div>
-    </div>
-    <div class="itemC">
-      <div class="itemsList" v-for="(item, index) in itemsList" :key="index">
-        <div class="blockA">
-          <div class="nameC">{{item.remark}}</div>
-          <div class="timeC">{{item.createTime}}</div>
-        </div>
-        <div class="blockB">
-          <div class="integralC">{{item.type == 1 ? '-' : '+'}}{{item.amount/100}}</div>
-        </div>
+      <div class="btn">
+        <div>提现</div>
+        <div>充值</div>
       </div>
     </div>
+
+    <van-tabs v-model="active">
+      <van-tab>
+        <template #title>
+          <div class="itemB">
+            <div class="block"></div>
+            <div class="titleB">余额记录1</div>
+          </div>
+        </template>
+        <div class="itemC">
+          <div class="itemsList" v-for="(item, index) in itemsList" :key="index">
+            <div class="blockA">
+              <div class="nameC">{{item.remark}}</div>
+              <div class="timeC">{{item.createTime}}</div>
+            </div>
+            <div class="blockB">
+              <div class="integralC">{{item.type == 1 ? '-' : '+'}}{{item.amount/100}}</div>
+            </div>
+          </div>
+        </div>
+      </van-tab>
+      <van-tab>
+        <template #title>
+          <div class="itemB">
+            <div class="block"></div>
+            <div class="titleB">余额记录2</div>
+          </div>
+        </template>
+        <div class="itemC">
+          <div class="itemsList" v-for="(item, index) in itemsList" :key="index">
+            <div class="blockA">
+              <div class="nameC">{{item.remark}} + 1</div>
+              <div class="timeC">{{item.createTime}} + 1</div>
+            </div>
+            <div class="blockB">
+              <div class="integralC">{{item.type == 1 ? '-' : '+'}}{{item.amount/100}} + 1</div>
+            </div>
+          </div>
+        </div>
+      </van-tab>
+    </van-tabs>
+
+<!--    <div class="itemB">-->
+<!--      <div class="block"></div>-->
+<!--      <div class="titleB">余额记录</div>-->
+<!--    </div>-->
+<!--    <div class="itemC">-->
+<!--      <div class="itemsList" v-for="(item, index) in itemsList" :key="index">-->
+<!--        <div class="blockA">-->
+<!--          <div class="nameC">{{item.remark}}</div>-->
+<!--          <div class="timeC">{{item.createTime}}</div>-->
+<!--        </div>-->
+<!--        <div class="blockB">-->
+<!--          <div class="integralC">{{item.type == 1 ? '-' : '+'}}{{item.amount/100}}</div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
   </div>
 </template>
 
 
 <script>
+  import { Tab, Tabs } from 'vant';
 export default {
   data() {
     return {
@@ -43,10 +90,13 @@ export default {
         // userCode: "13226150",
         accountType: 1,
       },
+      active: 0
     };
   },
   components: {
-    "hl-header": () => import("@/components/header"),
+    "van-header": () => import("@/components/header"),
+    "van-tab": Tab,
+    "van-tabs": Tabs,
   },
   created() {
     this.getAccountLog();
@@ -78,6 +128,7 @@ export default {
     justify-content: center;
     align-items: center;
     color: #ffffff;
+    flex-direction: column;
     .integralNum {
       font-size: 36px;
       font-weight: bold;
@@ -85,13 +136,19 @@ export default {
     .Company {
       font-size: 12px;
     }
+    .btn{
+      display: flex;
+      >div{line-height: 40px;font-size: 20px; text-align: center;width: 100px;
+      border: 1px solid #fff; color: #fff;border-radius: 20px;
+      }
+    }
   }
   .itemB {
     display: flex;
     align-items: center;
     height: 30px;
-    margin-top: 30px;
-    margin-left: 12.5px;
+    /*margin-top: 30px;*/
+    /*margin-left: 12.5px;*/
     .block {
       width: 6px;
       height: 21.5px;
