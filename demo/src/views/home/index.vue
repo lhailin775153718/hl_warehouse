@@ -31,6 +31,7 @@ import imgSwipe from "@/components/imgSwipe";
 import grid from "@/components/grid";
 import deadline from "@/components/deadline";
 import recommend from "@/components/recommend";
+import axios from "axios";
 
 export default {
   data() {
@@ -47,13 +48,12 @@ export default {
           text: "特惠专区",
           icon: require('../../assets/image/tehui.png'),
           path: "/recommendationZone",
-          type: 4,
+          type: 1,
         },
         {
           text: "爆款专区",
           icon: require('../../assets/image/baokuan.png'),
-          path: "/recommendationZone",
-          type: 1,
+          path: "/baokuan",
         },
         {
           text: "低价专区",
@@ -80,13 +80,34 @@ export default {
     "hl-searchHistory": searchHistory,
   },
   created() {
-    this.getSwiperImage();
-    let code = this.$route.query.code;
-    if(code) {
-      this.getVXUserInfo(code);
-    }
+    this.checkToken();
   },
   methods: {
+    checkToken() {
+      let userInfo = this.$storage.getItem("userInfo");
+      if(userInfo) {
+        this.$https.get(this.$api.common.checkToken).then((res) => {
+          if(res.data.code == 1) {
+            this.getSwiperImage();
+          } else {
+            let wxCode = this.GetUrlParam('code');
+            this.getVXUserInfo(wxCode);
+          }
+        });
+      } else {
+        this.getUserInfo();
+        // let wxCode = this.GetUrlParam('code');
+        // this.getVXUserInfo(wxCode);
+      }
+    },
+    getUserInfo() {
+      let params = { userCode: "13226150"}
+      let that = this;
+      this.$https.get(that.$api.common.getUserInfo, params).then((res) => {
+        that.$storage.setItem("userInfo", res.data.data);
+        that.getSwiperImage();
+      });
+    },
     getSwiperImage() {
       let that = this;
       this.$https.get(that.$api.common.getSwiperImage).then((res) => {
@@ -115,15 +136,42 @@ export default {
     },
     //获取微信用户信息
     getVXUserInfo(code) {
+      let that = this;
       let params = {
         code: code,
-        userCode: this.$storage.getItem("userInfo").userCode,
+        // userCode: this.$storage.getItem("userInfo").userCode,
         sdk: "JS_SDK"
       }
-      this.$https.get(this.$api.common.getVXUserInfo, params).then((res) => {
-        console.log(res)
+      axios({
+        url: "http://shopkeeper.gdkeyong.com/api" + that.$api.common.getVXUserInfo,
+        method: "get",
+        params: params,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded;charset=utf-8"
+        }
+      }).then((res) => {
+        that.$storage.setItem("userInfo", res.data.data);
+        that.getSwiperImage();
       });
     },
+    GetUrlParam(paraName){
+      try
+      {
+        let url = window.location.href
+        if (url.indexOf(paraName + '=') > -1) {
+          let array = url.split(paraName + '=')[1]
+          let data =array.split('&')[0]
+          return data
+        } else {
+          return ''
+        }
+      }
+      catch(err)
+      {
+        console.log(err)
+        return  ''
+      }
+    }
   },
 };
 </script>

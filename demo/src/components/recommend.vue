@@ -1,19 +1,7 @@
 <template>
-  <van-list
-    ref="listloading"
-    v-model="loading"
-    :finished="finished"
-    finished-text="没有更多了"
-    @load="onload"
-  >
+  <van-list ref="listloading" v-model="loading" :finished="finished" finished-text="没有更多了" :immediate-check="false" @load="onload" >
     <div class="recommend">
-      <div
-        class="recommend-item"
-        :class="{'recommendFirst':index == 0 || index == 1}"
-        v-for="(item,index) in recommend"
-        :key="index"
-        @click="toDetail(item)"
-      >
+      <div class="recommend-item" :class="{'recommendFirst':index == 0 || index == 1}" v-for="(item,index) in recommend" :key="index" @click="toDetail(item)" >
         <img class="recommend-item-image" :src="imageUrl + item.image" />
         <div class="recommend-item-content">
           <p>{{item.goodsName}}</p>
@@ -56,19 +44,16 @@ export default {
   methods: {
     getGoodsList() {
       let that = this;
-      this.$https
-        .get(that.$api.common.GoodsList, that.selectInfo)
-        .then((res) => {
-          let array = res.data.data.records;
-          this.recommend.push(...array);
-          this.count = res.data.data.pages;
+      this.$https.get(that.$api.common.GoodsList, that.selectInfo).then((res) => {
+        let array = res.data.data.records;
+        this.recommend.push(...array);
 
-          if (this.selectInfo.page < res.data.data.pages) {
-            this.loading = false;
-          } else {
-            this.finished = true;
-          }
-        });
+        if (this.selectInfo.page < res.data.data.pages) {
+          this.loading = false;
+        } else {
+          this.finished = true;
+        }
+      });
     },
     toDetail(val) {
       this.$router.push({

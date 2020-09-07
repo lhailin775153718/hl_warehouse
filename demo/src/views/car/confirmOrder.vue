@@ -22,7 +22,7 @@
             <div class="content">
               <div class="name">{{items.goodsName}}</div>
               <div class="price flex_c_sb">
-                <div class="oprice">{{items.price}}</div>
+                <div class="oprice">{{(items.price/100).toFixed(2)}}</div>
                 <div class="num">x {{items.number}}</div>
               </div>
             </div>
@@ -38,30 +38,26 @@
       </div>
       <div class="itemC">
         <textarea v-model="item.remark" placeholder="给卖家留言..."></textarea>
-      </div>s
-<!--      <van-cell title="优惠券" :value="item.couponText" is-link center @click="showCoupon(item)" />-->
+      </div>
+     <van-cell title="优惠券" :value="item.couponText" is-link center @click="couponShow = true" />
     </div>
 
-    <van-cell-group style="margin-top:10px;">
-      <van-cell title="支付方式" :value="payTypeText" is-link center @click="payTypeShow = true" />
-<!--      <van-cell title="可以用500金币抵￥5.00" center>-->
-<!--        <template #right-icon>-->
-<!--          <van-switch v-model="checked" size="20" active-color="#D8674D" inactive-color="#f5f5f5" />-->
-<!--        </template>-->
-<!--      </van-cell>-->
-    </van-cell-group>
-
-    <van-cell-group style="margin-top:10px;margin-bottom:70px;">
+    <van-cell-group class="group-bottom">
       <van-cell title="商品金额" :value="'￥' + (price/100).toFixed(2)" center />
-      <van-cell title="-优惠券折扣" :value="count" center />
+      <van-cell title="支付方式" :value="payTypeText" is-link center @click="payTypeShow = true" />
+      <van-cell v-if="orderData.gold != 0" :title="'可以用' + orderData.gold + '金币抵￥' + (orderData.deductPrice/100).toFixed(2)" center>
+        <template #right-icon>
+          <van-switch v-model="checked" @change="checkChange" size="20" active-color="#D8674D" inactive-color="#f5f5f5" />
+        </template>
+      </van-cell>
     </van-cell-group>
 
     <div class="footer">
       <span class="span1">共{{count}}件,</span>
       <span class="span2">合计:</span>
       <span class="span3">￥</span>
-      <span class="price">{{(price/100-count).toFixed(2)}}</span>
-      <div class="submitOrder" @click="submitOrder">提交订单</div>
+      <span class="price">{{(payPrice/100).toFixed(2)}}</span>
+      <div class="submitOrder" @click="pickPayType">提交订单</div>
     </div>
 
     <van-popup v-model="payTypeShow" position="bottom">
@@ -73,13 +69,19 @@
         <van-icon size="16" name="arrow-left"/>
         <span>确定</span>
       </div>
-      <hl-coupon ref="coupon" @userReceive="userReceive" @pickCoupon="pickCoupon" />
+      <hl-coupon class="coupon-container" ref="coupon" :couponList="couponList" @userReceive="userReceive" @pickCoupon="pickCoupon" />
+    </van-popup>
+
+    <van-popup v-model="showKeyboard" position="bottom" style="height: 100%;">
+      <van-password-input :value="password" info="密码为 6 位数字" :focused="showKeyboard" @focus="showKeyboard = true" />
+      <!-- 数字键盘 -->
+      <van-number-keyboard :show="showKeyboard" @input="onInput" @delete="onDelete" @blur="showKeyboard = false" />
     </van-popup>
   </div>
 </template>
 
 <script>
-import { Stepper, Cell, CellGroup, Switch, Popup, Picker, Icon } from "vant";
+import { Stepper, Cell, CellGroup, Switch, Popup, Picker, Icon, PasswordInput, NumberKeyboard } from "vant";
 import coupon from '@/components/coupon'
 export default {
   data() {
@@ -89,7 +91,7 @@ export default {
         title: "确认订单",
         isLeftArrow: true,
       },
-      userInfo: this.$storage.getItem("userInfo"),
+      userInfo: {},
       orderData: {},
       address: {},
       count: 0,
@@ -106,6 +108,10 @@ export default {
       payTypeList: [{ text: "余额", value: 1}, { text: "微信支付", value: 3}],
       couponShow: false,
       item: {},
+      payPrice: 0,
+      showKeyboard: false,
+      password: "",
+      couponList: [],
     };
   },
   components: {
@@ -117,17 +123,20 @@ export default {
     "van-popup": Popup,
     "van-picker": Picker,
     "hl-coupon": coupon,
-    "van-icon": Icon
+    "van-icon": Icon,
+    "van-password-input": PasswordInput,
+    "van-number-keyboard": NumberKeyboard
   },
   created() {
     this.getQuery();
     this.initialize();
     this.getAddress();
+    this.getUserInfo();
+    this.getMyCouponList();
   },
   methods: {
     getQuery() {
       this.orderData = JSON.parse(this.$route.query.order);
-      console.log(this.orderData);
     },
     initialize() {
       this.orderData.settlementShopGoodsList.forEach((res) => {
@@ -136,6 +145,7 @@ export default {
           this.count += res1.number;
         });
       });
+      this.payPrice = this.price;
       this.pay = this.$storage.getItem("pay");
     },
     getAddress() {
@@ -151,6 +161,30 @@ export default {
           });
       }
     },
+    getUserInfo() {
+      let params = { userCode: this.$storage.getItem("userInfo").userCode }
+      this.$https.get(this.$api.common.getUserInfo, params).then((res) => {
+        this.userInfo = res.data.data;
+        if(this.userInfo.gold >= this.price) {
+          this.deductPrice = this.price - 1;
+        } else {
+          this.deductPrice = this.userInfo.gold;
+        }
+      })
+    },
+    getMyCouponList() {
+      let params = {
+        page: 1,
+        pageSize: 20,
+        userCode: this.$storage.getItem("userInfo").userCode,
+        // actStatus: 2
+        isReceived: 1,
+      }
+      this.$https.get(this.$api.common.getCoupon, params).then((res) => {
+        console.log(res,"==========getMyCouponList")
+        this.couponList = res.data.data.records;
+      });
+    },
     toPage(path) {
       this.$router.push({
         path: path,
@@ -164,6 +198,13 @@ export default {
         },
       });
     },
+    pickPayType() {
+      if(this.payType == 1) {
+        this.onBuy();
+      } else {
+        this.submitOrder();
+      }
+    },
     submitOrder() {
       if(this.payType == "") {
         this.$toast.fail("请选择支付方式");
@@ -173,12 +214,17 @@ export default {
       let params = this.orderData;
       params.payType = this.payType;
       params.address = this.address;
+      params.isDeduct = this.checked;
       this.$https.post(that.$api.common.createOrder, params).then((res) => {
         if(this.payType == 1) {
-          this.$toast.success("支付成功");
-          setTimeout(() => {
-            that.$router.replace("/orderList");
-          }, 2000);
+          if(res.data.code == 1) {
+            this.$toast.success("支付成功");
+            setTimeout(() => {
+              that.$router.replace("/orderList");
+            }, 2000);
+          } else {
+            this.$toast.success(res.data.message);
+          }
         } else {
           this.wxPay(res.data.data.orderNo);
         }
@@ -199,31 +245,32 @@ export default {
     onBridgeReady(obj) {
       WeixinJSBridge.invoke(
       'getBrandWCPayRequest', {
-         "appId": obj.data.data.appId,     //公众号名称，由商户传入
-         "timeStamp": obj.data.data.timeStamp,         //时间戳，自1970年以来的秒数
-         "nonceStr": obj.data.data.nonceStr, //随机串
-         "package": obj.data.data.package,
-         "signType":"MD5",         //微信签名方式：
-         "paySign": obj.data.data.paySign //微信签名
+         "appId": obj.data.data.appId,     //公众号名称，由商户传入     
+         "timeStamp": obj.data.data.timeStamp,         //时间戳，自1970年以来的秒数     
+         "nonceStr": obj.data.data.nonceStr, //随机串     
+         "package": obj.data.data.package,     
+         "signType":"MD5",         //微信签名方式：     
+         "paySign": obj.data.data.paySign //微信签名 
       },function(res){
       if(res.err_msg == "get_brand_wcpay_request:ok" ){
-      // 使用以上方式判断前端返回,微信团队郑重提示：
-            //res.err_msg将在用户支付成功后返回ok，但并不保证它绝对可靠。
-          }
-      });
+          this.$router.push({
+            path: 'orderList'
+          })
+        } 
+      }); 
     },
     onPayTypeValue(obj) {
       this.payTypeText = obj.text;
       this.payType = obj.value;
       this.payTypeShow = false;
     },
-    showCoupon(item) {
-      this.couponShow = true;
-      this.item = item;
-      this.$nextTick(function() {
-        this.$refs.coupon.getCoupon(item.shopCode);
-      })
-    },
+    // showCoupon(item) {
+    //   this.couponShow = true;
+    //   this.item = item;
+    //   this.$nextTick(function() {
+    //     this.$refs.coupon.getCoupon(item.shopCode);
+    //   })
+    // },
     userReceive(val) {
       let that = this;
       let params = {
@@ -235,10 +282,42 @@ export default {
       });
     },
     pickCoupon(val) {
-      console.log(val)
+      console.log(val,"======选择使用的优惠券信息")
       this.item.couponText = val.actName;
       this.couponShow = false;
-    }
+    },
+    checkChange() {
+      if(this.checked) {
+        this.payPrice = this.price - this.orderData.deductPrice;
+      } else {
+        this.payPrice = this.price;
+      }
+    },
+    onBuy() {
+      this.showKeyboard = true;
+    },
+    onInput(key) {
+      this.password = (this.password + key).slice(0, 6);
+      if(this.password.length == 6) {
+        let that = this;
+        let params = {
+          password: this.password,
+          userCode: this.$storage.getItem("userInfo").userCode,
+        }
+        this.$https.post(that.$api.common.verifyWithDrawPwd, params).then((res) => {
+          console.log(res)
+          if(res.data.code == 1) {
+            this.showKeyboard = false;
+            this.submitOrder()
+          } else {
+            this.$toast.fail(res.data.message);
+          }
+        });
+      }
+    },
+    onDelete() {
+      this.password = this.password.slice(0, this.password.length - 1);
+    },
   },
 };
 </script>
@@ -404,11 +483,6 @@ export default {
       font-size: 14px;
       color: #959595;
     }
-    // &::before {
-    //   content: "实付：";
-    //   font-size: 14px;
-    //   color: #959595;
-    // }
   }
 }
 .footer {
@@ -451,5 +525,12 @@ export default {
     font-size: 14px;
     margin-right: 15px;
   }
+}
+.coupon-container {
+  height: calc(100% - 40px);
+}
+.group-bottom {
+  margin-top: 10px;
+  margin-bottom: 60px;
 }
 </style>

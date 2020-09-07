@@ -9,7 +9,10 @@
     <div class="detailContent">
       <p class="goodsName">{{goodsDetail.goodsName}}</p>
       <div class="goodsProp">
-        <span class="price">{{(goodsDetail.price/100).toFixed(2)}}<span class="yuanjia">{{(goodsDetail.originalPrice/100).toFixed(2)}}</span></span>
+        <span class="price">{{(goodsDetail.price/100).toFixed(2)}}
+          <span class="yuanjia">{{(goodsDetail.originalPrice/100).toFixed(2)}}</span>
+          <span class="jifen" v-if="goodsDetail.integral != 0">{{goodsDetail.integral}}</span>
+        </span>
         <div class="goodsProp-right">
           <span class="num">已售{{goodsDetail.sales}}件</span>
           <img :src="goodsDetail.isCollect ? require('../../assets/image/follow-act.png') : require('../../assets/image/follow-bg.png')" @click="collect" />
@@ -67,19 +70,10 @@ export default {
           });
         });
         this.goodsDetail = res.data.data;
+        console.log(this.goodsDetail,"==========")
       });
     },
     collect() {
-      // let params = {
-      //   page: 1,
-      //   pageSize: 10,
-      //   userCode: this.$storage.getItem("userInfo").userCode,
-      // };
-      // this.$https.get(this.$api.common.getCollectList, params).then((res) => {
-      //   console.log(res);
-      // });
-      // return
-
       let url = this.goodsDetail.isCollect ? this.$api.common.cancelCollect : this.$api.common.addCollect;
       this.goodsDetail.isCollect = !this.goodsDetail.isCollect;
       let params = {
@@ -164,5 +158,16 @@ export default {
   color: #797b7d;
   margin-left: 10px;
   font-size: 14px;
+}
+.jifen {
+  color: #da251c;
+  margin-left: 10px;
+  font-size: 14px;
+  &::before {
+    content: "+";
+  }
+  &::after {
+    content: "积分";
+  }
 }
 </style>

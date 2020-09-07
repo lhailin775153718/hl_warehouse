@@ -38,7 +38,6 @@ export default {
   },
   created() {
     this.wxCode = this.GetUrlParam('code');
-    console.log('code', this.wxCode)
   },
   methods: {
     getCode() {
@@ -117,13 +116,10 @@ export default {
       {
         let url = window.location.href
         if (url.indexOf(paraName + '=') > -1) {
-          // console.log('123')
           let array = url.split(paraName + '=')[1]
           let data =array.split('&')[0]
-          // console.log(data)
           return data
         } else {
-          // console.log('789')
           return ''
         }
       }

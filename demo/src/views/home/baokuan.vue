@@ -27,7 +27,8 @@
         v-model="loading"
         :finished="finished.state"
         :finished-text="finished.text"
-        @load="getActivityList"
+        :immediate-check="false"
+        @load="onload"
       >
         <div class="list">
           <div
@@ -61,7 +62,7 @@ export default {
     return {
       imageUrl: this.$https.imageUrl,
       header: {
-        title: "",
+        title: "爆款专区",
         isLeftArrow: true,
       },
       selectInfo: "",
@@ -93,46 +94,32 @@ export default {
     "van-list": List,
   },
   created() {
-    this.getQuery();
+    this.selectInfo = this.$route.query.selectInfo;
+    this.getActivityList();
   },
   methods: {
-    getQuery() {
-      this.header.title =
-        this.$route.query.text == undefined ? "商品" : this.$route.query.text;
-      this.selectInfo =
-        this.$route.query.selectInfo == undefined
-          ? ""
-          : this.$route.query.selectInfo;
-      this.selectForm.activityType =
-        this.$route.query.type == undefined ? "" : this.$route.query.type;
-      this.selectForm.goodsName =
-        this.$route.query.selectInfo == undefined
-          ? ""
-          : this.$route.query.selectInfo;
-    },
     getActivityList() {
       let params = this.selectForm;
       params.goodsName = this.selectInfo;
       let that = this;
-      this.$https.get(that.$api.common.activityGoodsList, params).then((res) => {
+      this.$https.get(that.$api.common.GoodsList, params).then((res) => {
         let array = res.data.data.records;
-        if (this.selectForm.page > 1) {
-          this.list.push(...array);
-        } else {
-          this.list = array;
-        }
+        this.list.push(...array);
 
-        if (this.selectForm.page == res.data.data.pages) {
-          this.finished.state = true;
+        if (this.selectForm.page < res.data.data.pages) {
+          this.loading = false;
         } else {
-          this.selectForm.page = this.selectForm.page++;
+          this.finished = true;
         }
       });
     },
+    onload() {
+      this.selectForm.page++;
+      this.getActivityList();
+    },
     toDetail(val) {
-      console.log(val);
       this.$router.push({
-        path: "commodityDetail",
+        path: "goodsDetail",
         query: {
           obj: JSON.stringify(val),
         },

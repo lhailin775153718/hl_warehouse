@@ -168,6 +168,10 @@ export default {
           array.push(res);
         }
       });
+      if(shoppingCarIds.length == 0) {
+        this.$toast.fail("请勾选购买商品")
+        return
+      }
       let params = {
         shoppingCarIds: shoppingCarIds,
         userCode: this.$storage.getItem("userInfo").userCode,

@@ -52,7 +52,7 @@
     </div>
 
     <div class="itemE">
-      <div class="fuzhi">复制</div>
+      <!-- <div class="fuzhi">复制</div> -->
       <div class="itemEList">订单编号: {{orderData.orderNo}}</div>
       <div class="itemEList">下单时间: {{orderData.createTime}}</div>
       <div class="itemEList">发货时间: {{orderData.sendTime}}</div>
@@ -61,7 +61,7 @@
 
     <div class="footer">
       <div class="cencal">取消订单</div>
-      <div class="warn">提醒发货</div>
+      <div class="warn" @click="toPay">去支付</div>
     </div>
   </div>
 </template>
@@ -88,8 +88,10 @@ export default {
   methods: {
     getQuery() {
       this.orderData = JSON.parse(this.$route.query.obj);
-      console.log(this.orderData);
     },
+    toPay() {
+      console.log(this.orderData,"=========")
+    }
   },
 };
 </script>

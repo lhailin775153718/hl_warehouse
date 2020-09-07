@@ -39,6 +39,7 @@ export default {
     getCardList() {
       let params = {};
       params.userCode = this.$storage.getItem("userInfo").userCode;
+      // params.userCode = "13226150"
       this.$https.get(this.$api.common.getCardList, params).then((res) => {
         console.log(res)
         this.list = res.data.data;

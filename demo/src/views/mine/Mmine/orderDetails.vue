@@ -61,7 +61,7 @@
 
     <div class="footer">
       <div class="cencal">取消订单</div>
-      <div class="pay">去支付</div>
+      <div class="pay" @click="payOrder">去支付</div>
     </div>
   </div>
 </template>
@@ -89,6 +89,37 @@ export default {
     getQuery() {
       this.orderData = JSON.parse(this.$route.query.obj);
       console.log(this.orderData);
+    },
+    payOrder() {
+      if(this.orderData.payType == 3) {
+        let that = this;
+        let params = {
+          orderNo: this.orderData.orderNo,
+          payType: "JSAPI",
+          userCode: this.$storage.getItem("userInfo").userCode,
+          appId: "wx1bdbdd9e8b85ff2f"
+        }
+        this.$https.post(that.$api.common.wxPay, params).then((res) => {
+          this.onBridgeReady(res);
+        });
+      }
+    },
+    onBridgeReady(obj) {
+      WeixinJSBridge.invoke(
+      'getBrandWCPayRequest', {
+         "appId": obj.data.data.appId,     //公众号名称，由商户传入     
+         "timeStamp": obj.data.data.timeStamp,         //时间戳，自1970年以来的秒数     
+         "nonceStr": obj.data.data.nonceStr, //随机串     
+         "package": obj.data.data.package,     
+         "signType":"MD5",         //微信签名方式：     
+         "paySign": obj.data.data.paySign //微信签名 
+      },function(res){
+      if(res.err_msg == "get_brand_wcpay_request:ok" ){
+          this.$router.push({
+            path: 'orderList'
+          })
+        } 
+      }); 
     },
   },
 };

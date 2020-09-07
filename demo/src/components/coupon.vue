@@ -1,20 +1,23 @@
 <template>
-  <div>
-    <div class="column" v-for="(item,index) in list" :key="index" @click="pickCoupon(item)">
-      <div class="columnLeft">{{item.preset/100}}</div>
-      <div class="columnRight">
-        <div class="name">{{item.actName}}</div>
-        <div class="condition">111</div>
-        <div class="time">有效期至:{{item.endTime}}</div>
+  <div class="container">
+    <div class="column" v-for="(item,index) in couponList" :key="index" @click="pickCoupon(item)">
+      <div v-if="item.isUsable">
+        <div class="columnLeft">{{item.preset/100}}</div>
+        <div class="columnRight">
+          <div class="name">{{item.actName}}</div>
+          <div class="condition">111</div>
+          <div class="time">有效期至:{{item.endTime}}</div>
+        </div>
+        <div class="btn" v-if="item.isReceived != 1" @click="userReceive(item)">立刻领取</div>
+        <img class="statusImage" v-if="item.isReceived == 1" src="../assets/image/coupon1.png" alt />
       </div>
-      <div class="btn" v-if="item.isReceived != 1" @click="userReceive(item)">立刻领取</div>
-      <img class="statusImage" v-if="item.isReceived == 1" src="../assets/image/coupon1.png" alt />
     </div>
   </div>
 </template>
 
 <script>
 export default {
+  props: ["couponList"],
   data() {
     return {
       imageUrl: this.$https.imageUrl,
@@ -30,23 +33,24 @@ export default {
   components: {
   },
   created() {
+    console.log(this.couponList)
   },
   methods: {
-    getCoupon(shopCode) {
-      let params = {
-        page: 1,
-        pageSize: 10,
-        userCode: this.$storage.getItem("userInfo").userCode,
-        actStatus: 2,
-        shopCode: shopCode
-      };
-      let that = this;
-      this.$https.get(that.$api.common.getShopCoupon, params).then((res) => {
-        console.log(res);
-        let array = res.data.data.records;
-        this.list = array;
-      });
-    },
+    // getCoupon(shopCode) {
+    //   let params = {
+    //     page: 1,
+    //     pageSize: 10,
+    //     userCode: this.$storage.getItem("userInfo").userCode,
+    //     actStatus: 2,
+    //     shopCode: shopCode
+    //   };
+    //   let that = this;
+    //   this.$https.get(that.$api.common.getShopCoupon, params).then((res) => {
+    //     console.log(res);
+    //     let array = res.data.data.records;
+    //     this.list = array;
+    //   });
+    // },
     userReceive(item) {
       this.$emit('userReceive', item);
     },
@@ -58,7 +62,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.column {
+.column>div {
   height: 90px;
   width: 350px;
   margin: auto;

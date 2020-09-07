@@ -66,14 +66,14 @@ export default {
           status: 0,
         },
         {
-          text: "配送中",
+          text: "待发货",
           icon: require("../../assets/image/peisongzhong.png"),
-          status: 2,
+          status: 1,
         },
         {
-          text: "已完成",
+          text: "待收货",
           icon: require("../../assets/image/yiwancheng.png"),
-          status: 4,
+          status: 2,
         },
         {
           text: "待评价",
@@ -81,9 +81,9 @@ export default {
           status: 3,
         },
         {
-          text: "退款/售后",
+          text: "已完成",
           icon: require("../../assets/image/tuikuan.png"),
-          status: 5,
+          status: 4,
         },
       ],
       columnNum: 5,
@@ -97,6 +97,11 @@ export default {
   },
   created() {
     this.getUserInfo();
+    this.getOrderNumber();
+    this.getOrderNumber1();
+    this.getOrderNumber2();
+    this.getOrderNumber3();
+    this.getOrderNumber4();
   },
   methods: {
     getUserInfo() {
@@ -106,7 +111,6 @@ export default {
       });
     },
     goRouter(item) {
-      console.log("item", item);
       this.$router.push({ name: item });
     },
     toPage(path) {
@@ -117,8 +121,50 @@ export default {
         path:'/orderList',
         query:{
           status: val.status
-        }})
-    }
+        }
+      })
+    },
+    getOrderNumber() {
+      let params = { page: 1, pageSize: 20, status: 0 }
+      this.$https.get(this.$api.common.getOrderList, params).then((res) => {
+        if(res.data.data.total > 0) {
+          this.grid[0].badge = res.data.data.total;
+          this.$set(this.grid[0], "badge", res.data.data.total)
+        }
+      });
+    },
+    getOrderNumber1() {
+      let params = { page: 1, pageSize: 20, status: 1 }
+      this.$https.get(this.$api.common.getOrderList, params).then((res) => {
+        if(res.data.data.total > 0) {
+          this.$set(this.grid[1], "badge", res.data.data.total)
+        }
+      });
+    },
+    getOrderNumber2() {
+      let params = { page: 1, pageSize: 20, status: 2 }
+      this.$https.get(this.$api.common.getOrderList, params).then((res) => {
+        if(res.data.data.total > 0) {
+          this.$set(this.grid[2], "badge", res.data.data.total)
+        }
+      });
+    },
+    getOrderNumber3() {
+      let params = { page: 1, pageSize: 20, status: 3 }
+      this.$https.get(this.$api.common.getOrderList, params).then((res) => {
+        if(res.data.data.total > 0) {
+          this.$set(this.grid[3], "badge", res.data.data.total)
+        }
+      });
+    },
+    getOrderNumber4() {
+      let params = { page: 1, pageSize: 20, status: 4 }
+      this.$https.get(this.$api.common.getOrderList, params).then((res) => {
+        if(res.data.data.total > 0) {
+          this.$set(this.grid[4], "badge", res.data.data.total)
+        }
+      });
+    },
   },
 };
 </script>

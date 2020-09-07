@@ -40,6 +40,7 @@ export default {
         page: 1,
         pageSize: 10,
         userCode: this.$storage.getItem("userInfo").userCode,
+        // userCode: "13226150",
         accountType: 1,
       },
     };
@@ -55,7 +56,6 @@ export default {
       let params = this.selectForm;
       let that = this;
       this.$https.get(that.$api.common.getAccountLog, params).then((res) => {
-        console.log(res);
         let array = res.data.data.records;
         this.itemsList.push(...array);
       });

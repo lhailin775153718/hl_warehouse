@@ -46,6 +46,11 @@ export default {
         this.historyList.unshift(this.selectInfo);
         localStorage.setItem("historyList", JSON.stringify(this.historyList));
       }
+      this.$router.push({
+        path: "/baokuan",
+        query: { selectInfo: this.selectInfo },
+      });
+        return
       if (this.$route.path == "/home") {
         this.$router.push({
           path: "/recommendationZone",

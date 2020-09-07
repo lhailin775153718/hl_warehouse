@@ -14,8 +14,8 @@ export default {
                 params: _params || {},
                 headers: {
                     'source': 'H5',
-                    'token': Storage.getItem('userInfo').token,
-                    // 'token': 'TOKEN_fbfd5db990104332ab52adf79dc4b2d1',
+                    'token': 'TOKEN_6c50637d19714f59b8bf107497ea7e20',
+                    // 'token': Storage.getItem('userInfo').token,
                 }
             }).then(res => {
                 resolve(res);
@@ -35,8 +35,8 @@ export default {
                 data: _params || {},
                 headers: {
                     'source': 'H5',
-                    'token': Storage.getItem('userInfo').token,
-                    // 'token': 'TOKEN_fbfd5db990104332ab52adf79dc4b2d1',
+                    // 'token': Storage.getItem('userInfo').token,
+                    'token': 'TOKEN_6c50637d19714f59b8bf107497ea7e20',
                     'Content-Type': isFormData ? 'multipart/form-data' : 'application/json;charset=utf-8'
                 }
             }).then(res => {

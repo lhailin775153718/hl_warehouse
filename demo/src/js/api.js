@@ -1,4 +1,6 @@
 const common = {
+    checkToken: '/user/checkToken', //校验token
+    verifyWithDrawPwd: '/user/verifyWithDrawPwd', //校验支付密码
     getVXUserInfo: '/wx/getUserInfo', //获取微信用户信息
     wxPay: '/pay/wxPay/unifiedOrder', //微信支付统一下单
     getCode: '/system/sms/sendSms', //获取验证码
@@ -46,6 +48,7 @@ const common = {
 
     addCard: '/user/bankCard/addCard', //新增银行卡
     getCardList: '/user/bankCard/getList', //获取银行卡列表
+    getBankList: '/bank/getAll', //获取银行列表
 
     getUserInfo: '/user/getUserInfo', //获取用户详情
     userEdit: '/user/edit', //用户编辑

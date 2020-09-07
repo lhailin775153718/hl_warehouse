@@ -13,6 +13,7 @@ const mineComponent = resolve => require(['@/views/mine/index'], resolve)
 //home
 const recommendationZoneComponent = resolve => require(['@/views/home/recommendationZone'], resolve) //推荐专区
 const integralRegionComponent = resolve => require(['@/views/home/integralRegion'], resolve) //积分专区
+const baokuanComponent = resolve => require(['@/views/home/baokuan'], resolve) //爆款专区
 const timeLimitedComponent = resolve => require(['@/views/home/timeLimited'], resolve) //限时秒杀
 const commodityDetailComponent = resolve => require(['@/views/home/commodityDetail'], resolve) //活动商品详情页
 const goodsDetailComponent = resolve => require(['@/views/home/goodsDetail'], resolve) //商品详情页
@@ -53,7 +54,7 @@ import mine from '@/views/mine/Mmine/router'
 const router = new Router({
     routes: [
         ...mine,
-        { path: '/', redirect: '/login' },
+        { path: '/', redirect: '/home' },
         { path: '/login', component: loginCompnent },
         { path: '/register', component: registerCompnent },
         { path: '/home', component: homeComponent },
@@ -63,6 +64,7 @@ const router = new Router({
 
         { path: '/recommendationZone', component: recommendationZoneComponent },
         { path: '/integralRegion', component: integralRegionComponent },
+        { path: '/baokuan', component: baokuanComponent },
         { path: '/timeLimited', component: timeLimitedComponent },
         { path: '/commodityDetail', component: commodityDetailComponent },
         { path: '/goodsDetail', component: goodsDetailComponent },

@@ -6,7 +6,8 @@
       <van-goods-action-button color="#FF6800" type="warning" text="加入购物车" @click="addCar" />
       <van-goods-action-button color="#DB2016" type="danger" text="立即购买" @click="showBuy" />
     </van-goods-action>
-    <van-popup v-model="show" position="bottom">
+
+    <van-popup v-model="show" position="bottom" @touchmove.prevent>
       <div class="popup-container">
         <img class="popup-image" :src="imageUrl + detail.image" alt />
         <span class="price">{{price == 0 ? (detail.minPrice/100).toFixed(2) + '-' + (detail.maxPrice/100).toFixed(2) : (price/100*num).toFixed(2)}}</span>
@@ -29,7 +30,7 @@
       </div>
     </van-popup>
 
-    <van-popup v-model="isShowShop" class="recommendBg" position="bottom">
+    <van-popup v-model="isShowShop" class="recommendBg" position="bottom" @touchmove.prevent>
       <div class="shopTitle">
         <div class="shopName">{{shop.shopName}}</div>
         <img class="shopLogo" :src="imageUrl + shop.logoUrl" alt />
@@ -38,7 +39,7 @@
             <div class="shopNum">{{shopCount}}</div>
             <div class="all">全部商品</div>
           </div>
-          <div class="colunmItem" @click="toPage('/shopCoupon')">
+          <div class="colunmItem" @click="couponShow = true;">
             <img class="img" src="../assets/image/mineIcon2.png" />
             <div class="all">优惠券</div>
           </div>
@@ -48,19 +49,29 @@
         <img src="../assets/image/carLogo.png" />
         <span>推荐商品</span>
       </div>
-      <div class="recommend">
-        <div class="recommend-item" :class="{'recommendFirst':index == 0 || index == 1}" v-for="(item,index) in recommend" :key="index" @click="toDetail(item)" >
-          <img class="recommend-item-image" :src="imageUrl + item.image" />
-          <div class="recommend-item-content">
-            <p>{{item.goodsName}}</p>
-            <span class="contentPrice">
-              <span class="Currency">￥</span>
-              {{(item.price/100).toFixed(2)}}
-            </span>
-            <img class="contentImage" src="../assets/image/carLogo.png" />
+      <van-list ref="listloading" v-model="loading" :finished="finished" finished-text="没有更多了" :immediate-check="false" @load="getShopList" >
+        <div class="recommend">
+          <div class="recommend-item" :class="{'recommendFirst':index == 0 || index == 1}" v-for="(item,index) in recommend" :key="index" @click="toDetail(item)" >
+            <img class="recommend-item-image" :src="imageUrl + item.image" />
+            <div class="recommend-item-content">
+              <p>{{item.goodsName}}</p>
+              <span class="contentPrice">
+                <span class="Currency">￥</span>
+                {{(item.price/100).toFixed(2)}}
+              </span>
+              <img class="contentImage" src="../assets/image/carLogo.png" />
+            </div>
           </div>
         </div>
+      </van-list>
+    </van-popup>
+
+    <van-popup v-model="couponShow" position="right" style="width: 100%;">
+      <div class="popupHeader" @click="couponShow = false">
+        <van-icon size="16" name="arrow-left"/>
+        <span>确定</span>
       </div>
+      <hl-coupon ref="coupon" :couponList="couponList" @userReceive="userReceive" />
     </van-popup>
   </div>
 </template>
@@ -72,7 +83,10 @@ import {
   GoodsActionButton,
   Popup,
   Stepper,
+  List,
+  Icon
 } from "vant";
+import coupon from '@/components/coupon'
 import Storage from "../js/storage";
 export default {
   props: ["detail", "activityId"],
@@ -90,6 +104,16 @@ export default {
       specDetail: "",
       priceCode: "",
       isBuy: false,
+      finished: false,
+      loading: false,
+      selectInfo: {
+        page: 1,
+        pageSize: 10,
+        orderBy: "desc",
+        sort: "sales",
+      },
+      couponShow: false,
+      couponList: []
     };
   },
   components: {
@@ -98,24 +122,30 @@ export default {
     "van-goods-action-button": GoodsActionButton,
     "van-popup": Popup,
     "van-stepper": Stepper,
+    "van-list": List,
+    "hl-coupon": coupon,
+    "van-icon": Icon
   },
-  created() {},
+  created() {
+    
+  },
   mounted() {},
   methods: {
     getShopList() {
-      let params = {
-        page: 1,
-        pageSize: 2,
-        shopCode: this.detail.shopCode,
-        orderBy: "desc",
-        sort: "sales",
-      };
+      let params = JSON.parse(JSON.stringify(this.selectInfo));
+      params.shopCode = this.detail.shopCode;
       let that = this;
       this.$https.get(that.$api.common.GoodsList, params).then((res) => {
         let array = res.data.data.records;
-        this.recommend = array;
+        this.recommend.push(...array);
+
+        if (this.selectInfo.page < res.data.data.pages) {
+          this.selectInfo.page++;
+          this.loading = false;
+        } else {
+          this.finished = true;
+        }
         this.shopCount = res.data.data.total;
-        console.log(this.recommend);
       });
     },
     getShop() {
@@ -126,6 +156,19 @@ export default {
       let that = this;
       this.$https.get(that.$api.common.getShop, params).then((res) => {
         this.shop = res.data.data;
+      });
+    },
+    getShopCouponList() {
+      let params = {
+        page: 1,
+        pageSize: 10,
+        userCode: this.$storage.getItem("userInfo").userCode,
+        actStatus: 2,
+        shopCode: this.detail.shopCode
+      };
+      let that = this;
+      this.$https.get(that.$api.common.getShopCoupon, params).then((res) => {
+        this.couponList = res.data.data.records;
       });
     },
     addCar() {
@@ -164,10 +207,15 @@ export default {
       }
       let that = this;
       this.$https.get(that.$api.common.getPrice, params).then((res) => {
-        this.price = res.data.data == null ? 0 : res.data.data.price;
+        this.price = res.data.data.price == null ? 0 : res.data.data.price;
       });
     },
     submit() {
+      if(this.price == 0 || this.price == null) {
+        this.$toast.fail("请选择商品规格");
+        return
+      }
+
       let params = {
         shopCode: this.detail.shopCode,
         goodsCode: this.detail.goodsCode,
@@ -176,12 +224,20 @@ export default {
         specDetail: this.specDetail,
         priceCode: this.priceCode,
       };
+      if(this.activityId) {
+        params.activityId = this.activityId;
+      }
       let that = this;
       this.$https.post(that.$api.common.addGoods, params).then((res) => {
         this.$toast.success("已加入购物车");
       });
     },
     buy() {
+      if(this.price == 0 || this.price == null) {
+        this.$toast.fail("请选择商品规格");
+        return
+      }
+
       let params = {
         id: this.detail.id,
         shopCode: this.detail.shopCode,
@@ -194,7 +250,6 @@ export default {
       };
       let that = this;
       this.$https.post(that.$api.common.buyGoods, params).then((res) => {
-        console.log(res);
         this.$router.push({
           path: "confirmOrder",
           query: {
@@ -214,11 +269,22 @@ export default {
         },
       });
     },
+    userReceive(val) {
+      let that = this;
+      let params = {
+        actCode: val.actCode,
+        userCode: this.$storage.getItem("userInfo").userCode,
+      }
+      this.$https.post(that.$api.common.userReceive, params).then((res) => {
+        this.getShopCouponList();
+      });
+    },
   },
   watch: {
     detail(newVal, oldVal) {
       this.getShopList();
       this.getShop();
+      this.getShopCouponList();
     },
   },
 };
@@ -451,5 +517,9 @@ export default {
 }
 /deep/ .van-overlay {
   background-color: rgba(0, 0, 0, 0.3);
+}
+.van-list {
+  height: 300px;
+  overflow: scroll;
 }
 </style>

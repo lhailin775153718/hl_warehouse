@@ -4,16 +4,10 @@
     <van-tabs v-model="active" @click="statusEdit">
       <van-tab class="test123456" v-for="(item, tabIndex) in tabList" :key="tabIndex" :title="item">
         <div class="itemA" :style="{height: height + 'px'}">
-          <div
-            class="itemsList"
-            v-for="(item, index) in itemsList"
-            :key="index"
-            @click="toPage(item)"
-            v-if="item.status == tabIndex"
-          >
+          <div class="itemsList" v-for="(item, index) in itemsList" :key="index" @click="toDetail(item)">
             <div class="blockA flex_c_sb">
               <div class="orderId">{{item.orderNo}}</div>
-              <div class="orderState">{{tabList[item.status]}}</div>
+              <div class="orderState">{{tabList[item.status + 1]}}</div>
             </div>
             <div class="commodity flex_c_sb" v-for="items in item.orderDetailList" :key="items.id">
               <img class="img" :src="imageUrl + items.goodsImg" />
@@ -28,17 +22,29 @@
             </div>
             <div class="blockC flex_c_sb">
               <div class="Allprice">{{(item.price/100).toFixed(2)}}</div>
-              <div class="btn">产看物流</div>
+              <div v-if="item.status == 0" class="btn" @click="toPage(item)">去支付</div>
+              <div v-if="item.status == 1" class="btn">提醒发货</div>
+              <div v-if="item.status == 2" class="btn">查看物流</div>
+              <div v-if="item.status == 2" class="btn">确定收货</div>
+              <div v-if="item.status == 3" class="btn">去评价</div>
+              <div v-if="item.status == 4" class="btn">去评价</div>
+              <div v-if="item.status == 5" class="btn" @click="lookLogistics(item)">查看物流</div>
             </div>
           </div>
         </div>
       </van-tab>
     </van-tabs>
+
+    <van-popup v-model="showLogistics" position="bottom">
+      <van-cell title="物流名称" :value="deliveryName" />
+      <van-cell title="物流单号" :value="deliveryId" />
+    </van-popup>
   </div>
 </template>
 
 
 <script>
+import { Popup, Cell } from 'vant';
 export default {
   data() {
     return {
@@ -48,49 +54,63 @@ export default {
         isLeftArrow: true,
       },
       active: 0,
-      tabList: ["待付款", "待发货", "待收货", "待评价", "已完成", "退款/售后"],
+      tabList: ["全部", "待付款", "待发货", "待收货", "待评价", "已完成", "退款/售后"],
       itemsList: [],
       height: document.body.clientHeight - 90,
       selectForm: {
         page: 1,
         pageSize: 10,
-        shopCode: "",
-        orderNo: "",
-        userCode: this.$storage.getItem("userInfo").userCode,
-        startTime: "",
-        endTime: "",
-        status: 0,
+        // shopCode: "",
+        // orderNo: "",
+        // userCode: this.$storage.getItem("userInfo").userCode,
+        // startTime: "",
+        // endTime: "",
       },
+      deliveryName: "",
+      deliveryId: "",
+      showLogistics: false,
     };
   },
   components: {
     "hl-header": () => import("@/components/header"),
+    "van-popup": Popup,
+    "van-cell": Cell,
   },
   created() {
     this.getQuery();
   },
   methods: {
     getQuery(){
-      let status = this.$route.query.status
+      let status = this.$route.query.status;
       if(status != undefined){
-        this.active = status;
-        this.selectForm.status = status;
+        this.active = status + 1;
+        this.getOrderList(status);
+      } else {
+        this.getOrderList();
       }
-      this.getOrderList();
     },
-    getOrderList() {
+    getOrderList(status) {
       let that = this;
-      this.$https
-        .get(that.$api.common.getOrderList, that.selectForm)
-        .then((res) => {
-          let array = res.data.data.records;
-          this.itemsList.push(...array);
-        });
+      let params = JSON.parse(JSON.stringify(this.selectForm));
+      if(status != undefined) {
+        params.status = status;
+      }
+      this.$https.get(that.$api.common.getOrderList, params).then((res) => {
+        let array = res.data.data.records;
+        if(res.data.data.current == 1) {
+          that.itemsList = array;
+        } else {
+          that.itemsList.push(...array);
+        }
+      });
     },
     statusEdit(index) {
-      this.selectForm.status = index;
-      this.itemsList = [];
-      this.getOrderList();
+      if(index != 0) {
+        this.itemsList = [];
+        this.getOrderList(index - 1);
+      } else {
+        this.getOrderList();
+      }
     },
     toPage(val) {
       let path;
@@ -114,6 +134,35 @@ export default {
         },
       });
     },
+    lookLogistics(item) {
+      console.log(item)
+      this.deliveryId = item.deliveryId;
+      this.deliveryName = item.deliveryName;
+      this.showLogistics = true;
+    },
+    toDetail(val) {
+      console.log(val)
+      let path;
+      switch (val.status) {
+        case 0:
+          path = "/orderDetails";
+          break;
+        case 1:
+          path = "/orderDetails1";
+          break;
+        case 3:
+          path = "/orderDetails3";
+          break;
+        default:
+          return;
+      }
+      this.$router.push({
+        path: path,
+        query: {
+          obj: JSON.stringify(val),
+        },
+      });
+    }
   },
 };
 </script>
